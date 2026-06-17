@@ -1,0 +1,15 @@
+{
+  "name": "@draht/example-reference-playbook",
+  "version": "0.0.1",
+  "description": "draht reference playbook — the one shipped installable typed playbook. Full authoring→compile→deploy→run. (P9 implements.)",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "echo 'reference-playbook: stub — P9 implements'",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.0"
+  }
+}

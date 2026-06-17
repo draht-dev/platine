@@ -1,0 +1,60 @@
+name: Release
+
+# STUB — stable release on tag. Do not enable until:
+#   1. @draht npm org ownership is confirmed (draht-dev-owned).
+#   2. npm publish secret NPM_TOKEN is added to the repo.
+#   3. Changesets release workflow is fully validated against canary.
+#   4. At least one canary cycle has been published and consumed by fr3n (dogfood gate).
+#
+# Strategy: on a version tag (v*.*.*), changeset publish → stable tags on npm.
+# All @draht/* packages must be at the same version for the first stable release.
+
+on:
+  workflow_dispatch: # manual trigger only until fully wired
+
+# on:
+#   push:
+#     tags:
+#       - 'v*.*.*'
+
+jobs:
+  release:
+    name: publish stable release
+    runs-on: ubuntu-latest
+    if: false # STUB: disabled — see comments above
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Typecheck
+        run: pnpm -r exec tsc --noEmit
+
+      - name: Test
+        run: pnpm test
+
+      # STUB: when enabled:
+      # - name: Publish stable
+      #   run: pnpm changeset publish
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

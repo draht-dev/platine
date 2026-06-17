@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "files": [],
+  "references": [
+    { "path": "./packages/core" },
+    { "path": "./packages/manifest" },
+    { "path": "./packages/model" },
+    { "path": "./packages/runtime-aws" },
+    { "path": "./packages/sst" },
+    { "path": "./packages/cli" }
+  ]
+}

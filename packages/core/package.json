@@ -1,0 +1,54 @@
+{
+  "name": "@draht/core",
+  "version": "0.0.1",
+  "description": "draht agent framework — core authoring DSL, manifest types, and adapter seams. ZERO aws/node-only runtime deps.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    "./define-tool": {
+      "types": "./dist/define-tool.d.ts",
+      "import": "./dist/define-tool.js",
+      "require": "./dist/define-tool.cjs"
+    },
+    "./define-agent": {
+      "types": "./dist/define-agent.d.ts",
+      "import": "./dist/define-agent.js",
+      "require": "./dist/define-agent.cjs"
+    },
+    "./define-workflow": {
+      "types": "./dist/define-workflow.d.ts",
+      "import": "./dist/define-workflow.js",
+      "require": "./dist/define-workflow.cjs"
+    },
+    "./manifest": {
+      "types": "./dist/manifest/index.d.ts",
+      "import": "./dist/manifest/index.js",
+      "require": "./dist/manifest/index.cjs"
+    },
+    "./seams": {
+      "types": "./dist/seams/index.d.ts",
+      "import": "./dist/seams/index.js",
+      "require": "./dist/seams/index.cjs"
+    },
+    "./compile": {
+      "types": "./dist/compile.d.ts",
+      "import": "./dist/compile.js",
+      "require": "./dist/compile.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@standard-schema/spec": "^1.0.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.0",
+    "tsup": "^8.5.0",
+    "typescript": "~5.9.0",
+    "vitest": "^3.2.3"
+  }
+}

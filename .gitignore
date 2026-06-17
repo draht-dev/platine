@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.platine/
+*.tsbuildinfo
+.DS_Store
+coverage/
+.changeset/*.md
+!.changeset/config.json

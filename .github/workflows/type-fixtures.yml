@@ -1,0 +1,45 @@
+name: Type Fixtures
+
+on:
+  push:
+    branches: [main, 'feat/**', 'fix/**']
+  pull_request:
+    branches: [main]
+
+# This job runs the mis-wire tsc fixture suite.
+# fixtures/miswire/ contains intentionally broken workflows; tsc MUST error at
+# the exact expected lines — this gate locks the "readable error at the right location"
+# guarantee, which regresses silently if the builder API shape changes.
+# Fixtures land in P2; this job is wired now so it fails fast on the right shape.
+
+jobs:
+  type-fixtures:
+    name: mis-wire fixture tsc gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run mis-wire fixture suite
+        working-directory: fixtures/miswire
+        # The fixture runner script asserts each broken workflow errors at the expected tsc line.
+        # In P2 this will be: pnpm exec tsx scripts/assert-type-errors.ts
+        # For now (P0 stub) we just confirm the fixture package can be found.
+        run: |
+          echo "mis-wire fixture suite — wired in P0, fixtures land in P2"
+          ls -la .

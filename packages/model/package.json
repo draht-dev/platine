@@ -1,0 +1,31 @@
+{
+  "name": "@draht/model",
+  "version": "0.0.1",
+  "description": "draht agent framework — model adapters (Anthropic + Bedrock). NO Vercel AI SDK anywhere.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.1071.0",
+    "@draht/core": "workspace:*",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.0",
+    "tsup": "^8.5.0",
+    "typescript": "~5.9.0",
+    "vitest": "^3.2.3"
+  }
+}

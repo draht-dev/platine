@@ -1,0 +1,34 @@
+{
+  "name": "@draht/platine",
+  "version": "0.0.1",
+  "description": "platine CLI — the draht agent framework command-line interface. `platine init`, `platine dev`, `platine build`, `platine deploy`, `platine runs`.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "platine": "./dist/index.cjs"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@draht/core": "workspace:*",
+    "@draht/manifest": "workspace:*",
+    "@draht/model": "workspace:*",
+    "@draht/runtime-aws": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.0",
+    "tsup": "^8.5.0",
+    "typescript": "~5.9.0",
+    "vitest": "^3.2.3"
+  }
+}

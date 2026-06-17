@@ -1,0 +1,57 @@
+name: Canary Publish
+
+# STUB — this workflow is not active yet.
+# It will publish a canary (snapshot) release on every merge to main.
+# Strategy: changeset snapshot → publish --tag canary → @draht/* packages
+#           with version like 0.0.1-canary-<sha>.
+# fr3n pins the canary packages exactly (not semver range) because SST Bundler
+# moduleResolution + Lambda bundling need a real node_modules-resolvable package.
+# DO NOT uncomment until:
+#   1. @draht npm org ownership is confirmed (draht-dev-owned).
+#   2. npm publish secret NPM_TOKEN is added to the repo.
+#   3. The canary changeset config is validated.
+
+on:
+  workflow_dispatch: # manual trigger only until fully wired
+
+# on:
+#   push:
+#     branches: [main]
+
+jobs:
+  canary:
+    name: publish canary
+    runs-on: ubuntu-latest
+    if: false # STUB: disabled — see comments above
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      # STUB: when enabled, this will snapshot + publish canary
+      # - name: Publish canary
+      #   run: |
+      #     pnpm changeset version --snapshot canary
+      #     pnpm changeset publish --tag canary
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,36 @@
+{
+  "name": "@draht/sst",
+  "version": "0.0.1",
+  "description": "draht agent framework — SST/Pulumi deploy surface. Factory functions for draht.Agent and draht.Workflow.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@draht/manifest": "workspace:*"
+  },
+  "peerDependencies": {
+    "sst": "^4.15.0"
+  },
+  "peerDependenciesMeta": {
+    "sst": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.0",
+    "tsup": "^8.5.0",
+    "typescript": "~5.9.0",
+    "vitest": "^3.2.3"
+  }
+}

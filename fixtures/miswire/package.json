@@ -1,0 +1,15 @@
+{
+  "name": "@draht/fixtures-miswire",
+  "version": "0.0.1",
+  "description": "draht mis-wire tsc fixture suite. Each file is an intentionally broken workflow; tsc MUST error at the expected line. Gate: type-fixtures.yml CI job.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@draht/core": "workspace:*",
+    "typescript": "~5.9.0"
+  }
+}
