@@ -1,24 +1,45 @@
 // SPDX-License-Identifier: Apache-2.0
-// @draht/model — model adapters stub (P3 implements AnthropicModel + BedrockModel)
-//
-// Our own thin adapter over provider SDKs. NO Vercel AI SDK anywhere.
-// Independence + clean SST-partner narrative.
-//
-// Providers: Anthropic (direct, ANTHROPIC_API_KEY) + AWS Bedrock Converse.
-// Local dev default: Anthropic. Deployed default: Bedrock (execution-role IAM).
-//
-// CRITICAL: NO temperature/top_p/thinking params on opus-4-8/fable models.
-// Use the `effort` enum instead: "low" | "medium" | "high" | "xhigh" | "max".
-// This is enforced at the Model seam level (ModelRequest in @draht/core/seams).
-//
-// Provider wire-format differences (R5 in the risk register) are contained entirely
-// inside AnthropicModel and BedrockModel — not at the seam boundary.
-// Key differences to handle in P3:
-// - tool-block shapes differ between providers
-// - role:tool results must be plural/batched (alternation safe)
-// - consecutive same-role messages need merging
-// - system prompt separation differs
-// - streaming tool-call accumulation to contentBlockStop (Bedrock)
-// - model-id namespace + region routing (Bedrock cross-region inference profiles)
+// @draht/model — model adapters for Anthropic + Bedrock.
+// NO Vercel AI SDK anywhere.
 
-export {};
+export { AnthropicModel } from "./anthropic.js";
+export type { AnthropicMessagesClient } from "./anthropic.js";
+export { BedrockModel } from "./bedrock.js";
+export type { BedrockConverseClient } from "./bedrock.js";
+export { estimateCostUsd } from "./cost.js";
+
+import type { Model } from "@draht/core/seams";
+import type { AnthropicMessagesClient } from "./anthropic.js";
+import type { BedrockConverseClient } from "./bedrock.js";
+import { AnthropicModel } from "./anthropic.js";
+import { BedrockModel } from "./bedrock.js";
+
+export type CreateModelClient =
+  | { provider: "anthropic"; client: AnthropicMessagesClient }
+  | { provider: "bedrock"; client: BedrockConverseClient };
+
+/**
+ * createModel — picks the adapter by `anthropic/...` vs `bedrock/...` prefix.
+ * Pass in the provider client for testability; no env-var sniffing here.
+ */
+export function createModel(modelString: string, clientConfig: CreateModelClient): Model {
+  if (modelString.startsWith("anthropic/")) {
+    if (clientConfig.provider !== "anthropic") {
+      throw new Error(
+        `createModel: modelId "${modelString}" requires provider "anthropic" but got "${clientConfig.provider}"`,
+      );
+    }
+    return new AnthropicModel(clientConfig.client);
+  }
+  if (modelString.startsWith("bedrock/")) {
+    if (clientConfig.provider !== "bedrock") {
+      throw new Error(
+        `createModel: modelId "${modelString}" requires provider "bedrock" but got "${clientConfig.provider}"`,
+      );
+    }
+    return new BedrockModel(clientConfig.client);
+  }
+  throw new Error(
+    `createModel: unknown provider prefix in modelId "${modelString}". Expected "anthropic/" or "bedrock/"`,
+  );
+}

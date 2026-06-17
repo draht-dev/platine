@@ -1,14 +1,50 @@
 // SPDX-License-Identifier: Apache-2.0
-// @draht/core/manifest — Manifest schema, types, and validation (P1 implements)
-//
-// Single source of truth: zod schema (ManifestZ), inferred type (Manifest), and parseManifest().
-// Both the SST component (Pulumi-program time) and the Runtime (execution time) import from here.
-// Declarative, NOT an executable IR.
-//
-// Key invariants (implemented in P1):
-// - SCHEMA_VERSION gating for back-compat
-// - revision = sha256 of canonical JSON (stable key order, excluding revision itself)
-// - Manifest is schema-validated, not hand-rolled
-// - FieldSchema shared derive() used by both typed-graph generics and manifest serializer
+/**
+ * @draht/core/manifest — public surface for the Manifest sub-package.
+ *
+ * Both the SST component (Pulumi-program time) and the Runtime (execution time)
+ * import from this subpath. Neither hand-rolls a Manifest type.
+ *
+ * Exports:
+ *   - ManifestZ, Manifest type, FieldSchema type, and all sub-schemas
+ *   - SCHEMA_VERSION, isCompatibleVersion
+ *   - parseManifest, computeRevision
+ *   - ManifestValidationError, ManifestVersionError
+ *   - derive (FieldSchema derivation from zod schemas)
+ *   - zodToJsonSchema, JsonSchemaSerializationError (JSON-Schema serializer)
+ */
 
-export {};
+// Schema definitions and types
+export {
+  SCHEMA_VERSION,
+  ManifestZ,
+  FieldSchemaZ,
+  EventFilterZ,
+  TriggerZ,
+  ToolRefZ,
+  NodeZ,
+  EdgeZ,
+  SecretRefZ,
+} from "./schema.js";
+export type { Manifest, FieldSchema } from "./schema.js";
+
+// Version compatibility helper (also re-exports SCHEMA_VERSION, but schema.ts owns the canonical one)
+export { isCompatibleVersion } from "./version.js";
+
+// Validation and revision hashing
+export {
+  parseManifest,
+  computeRevision,
+  ManifestValidationError,
+  ManifestVersionError,
+} from "./validate.js";
+
+// FieldSchema derivation — THE cross-track contract
+export { derive } from "./field-schema.js";
+
+// JSON-Schema serializer helper
+export {
+  zodToJsonSchema,
+  JsonSchemaSerializationError,
+} from "./json-schema.js";
+export type { ToolInputJsonSchema } from "./json-schema.js";
