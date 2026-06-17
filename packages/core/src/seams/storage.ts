@@ -58,4 +58,11 @@ export interface Storage {
   resolveApproval(actionId: string, verdict: "approved" | "rejected"): Promise<void>;
 
   getPendingByAction(actionId: string): Promise<ApprovalRow | null>;
+
+  /**
+   * Look up the most recent approval row for a given (runId, nodeId).
+   * Returns null if no row exists. Used by drive() to detect already-granted
+   * approvals and skip the re-hold gate.
+   */
+  getApprovalByStep(t: TenantId, runId: RunId, nodeId: string): Promise<ApprovalRow | null>;
 }
