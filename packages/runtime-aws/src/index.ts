@@ -1,9 +1,16 @@
 // SPDX-License-Identifier: Apache-2.0
-// @draht/runtime-aws — AWS serverless runtime (P4 implements local executor; P5 adds AWS impls)
+// @draht/runtime-aws — AWS serverless runtime (P4 + P5)
 //
-// Executor + in-memory seam implementations:
+// Executor + in-memory seam implementations (P4):
 //   - executor.ts: level scheduler, Engine-3 flush+drain, fan-out, approval gate
 //   - runtime-local.ts: MemoryStorage/Queue/Bus — SAME executor.ts behind seams (for `platine dev`)
+//
+// AWS seam implementations (P5):
+//   - storage-dynamo.ts:     DynamoStorage (ElectroDB single-table, transactWrite step+sideeffect)
+//   - event-eventbridge.ts:  EventBridgeBus (chainDepth guard, best-effort)
+//   - channel-http.ts:       HttpChannel (InboundChannel + OutboundChannel, NDJSON streaming)
+//   - channel-slack.ts:      SlackChannel (InboundChannel, HMAC-SHA256 signature verification)
+//   - runtime-aws.ts:        AwsRuntime (SQS submit/resume/cancel/getRun)
 //
 // Key durability invariants (ALL greenfield — none exists in agent-studio reference):
 // 1. deterministic runId at channel/trigger boundary BEFORE enqueue (never nanoid() in executor)
@@ -39,3 +46,18 @@ export type {
   ToolHandler,
   LocalRuntimeOptions,
 } from "./runtime-local.js";
+
+// P5 — AWS adapter implementations
+export { DynamoStorage, DRAHT_TABLE_DEFINITION } from "./storage-dynamo.js";
+export { EventBridgeBus } from "./event-eventbridge.js";
+export {
+  HttpChannel,
+  encodeNdjsonLine,
+  encodeNdjsonStream,
+  buildHmacSignature,
+} from "./channel-http.js";
+export type { HttpChannelOptions, HttpParseResult } from "./channel-http.js";
+export { SlackChannel, buildSlackSignature } from "./channel-slack.js";
+export type { SlackChannelOptions } from "./channel-slack.js";
+export { AwsRuntime } from "./runtime-aws.js";
+export type { AwsRuntimeOptions } from "./runtime-aws.js";
