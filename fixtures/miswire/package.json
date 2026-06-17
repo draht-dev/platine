@@ -6,10 +6,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --reporter=verbose"
   },
   "devDependencies": {
     "@draht/core": "workspace:*",
-    "typescript": "~5.9.0"
+    "typescript": "~5.9.0",
+    "vitest": "^3.2.6",
+    "zod": "^3.25.76"
   }
 }

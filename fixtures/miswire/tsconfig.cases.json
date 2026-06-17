@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "//": "Harness-only config: includes the intentionally-mis-wired cases/ (which DO error by design) plus the valid/ baseline. Loaded programmatically by miswire.test.ts via the TS compiler API. NOT used by plain `tsc --noEmit` — that uses tsconfig.json, which excludes cases so the workspace typecheck stays clean.",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true,
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false
+  },
+  "include": ["cases/**/*.ts", "valid/**/*.ts"],
+  "exclude": ["node_modules"]
+}

@@ -10,7 +10,6 @@ on:
 # fixtures/miswire/ contains intentionally broken workflows; tsc MUST error at
 # the exact expected lines — this gate locks the "readable error at the right location"
 # guarantee, which regresses silently if the builder API shape changes.
-# Fixtures land in P2; this job is wired now so it fails fast on the right shape.
 
 jobs:
   type-fixtures:
@@ -35,11 +34,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build @draht/core (required for fixture type resolution)
+        run: pnpm --filter @draht/core build
+
       - name: Run mis-wire fixture suite
-        working-directory: fixtures/miswire
-        # The fixture runner script asserts each broken workflow errors at the expected tsc line.
-        # In P2 this will be: pnpm exec tsx scripts/assert-type-errors.ts
-        # For now (P0 stub) we just confirm the fixture package can be found.
-        run: |
-          echo "mis-wire fixture suite — wired in P0, fixtures land in P2"
-          ls -la .
+        run: pnpm --filter @draht/fixtures-miswire test

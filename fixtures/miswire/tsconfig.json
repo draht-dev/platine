@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "//": "Default config used by `tsc --noEmit` / `pnpm -r exec tsc`. Type-checks the harness (*.ts) + the valid/ baseline ONLY. The intentionally-mis-wired cases/ are EXCLUDED here (they error by design) and are checked exclusively by the harness via tsconfig.cases.json — this keeps the workspace typecheck clean.",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true,
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "types": ["node", "vitest/globals"]
+  },
+  "include": ["*.ts", "valid/**/*.ts"],
+  "exclude": ["node_modules", "cases"]
+}
