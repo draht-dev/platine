@@ -1,0 +1,102 @@
+Destroying (platine-smoke):
+
+@ destroying....
+ -  sst:sst:LinkRef SupportTriageAgentIngressUrlhttpLinkRef deleting (0s) 
+ -  sst:sst:LinkRef SupportTriageAgentResumeLinkRef deleting (0s) 
+ -  sst:sst:LinkRef SupportTriageAgentLinkRef deleting (0s) 
+@ destroying....
+ -  aws:lambda:Permission SupportTriageAgentIngressUrlhttpInvokeFunction deleting (0s) 
+ -  sst:sst:LinkRef SupportTriageAgentIngresshttpLinkRef deleting (0s) 
+ -  aws:lambda:Permission SupportTriageAgentResumeInvokeFunction deleting (0s) 
+ -  aws:lambda:Permission SupportTriageAgentIngressUrlhttpPublicFunctionUrlAccess deleting (0s) 
+ -  aws:lambda:FunctionUrl SupportTriageAgentResumeUrl deleting (0s) 
+ -  aws:lambda:Permission SupportTriageAgentResumePublicFunctionUrlAccess deleting (0s) 
+ -  sst:sst:LinkRef SupportTriageAgentExecutorLinkRef deleting (0s) 
+ -  aws:lambda:FunctionUrl SupportTriageAgentIngressUrlhttpUrl deleting (0s) 
+ -  aws:lambda:EventSourceMapping SupportTriageAgentQueueSubscriberUfawkaEventSourceMapping deleting (0s) 
+ -  aws:lambda:FunctionUrl SupportTriageAgentIngressUrlhttpUrl deleted (0.20s) 
+ -  aws:lambda:Permission SupportTriageAgentResumeInvokeFunction deleted (0.28s) 
+ -  aws:lambda:FunctionUrl SupportTriageAgentResumeUrl deleted (0.28s) 
+ -  aws:lambda:Permission SupportTriageAgentIngressUrlhttpInvokeFunction deleted (0.35s) 
+ -  aws:lambda:Permission SupportTriageAgentResumePublicFunctionUrlAccess deleted (0.43s) 
+ -  aws:lambda:Permission SupportTriageAgentIngressUrlhttpPublicFunctionUrlAccess deleted (0.54s) 
+@ destroying......
+ -  aws:lambda:EventSourceMapping SupportTriageAgentQueueSubscriberUfawkaEventSourceMapping deleted (3s) 
+ -  aws:lambda:Function SupportTriageAgentExecutorFunction deleting (0s) 
+ -  aws:lambda:Function SupportTriageAgentIngresshttpFunction deleting (0s) 
+ -  aws:lambda:Function SupportTriageAgentResumeFunction deleting (0s) 
+ -  aws:lambda:Function SupportTriageAgentIngressUrlhttpFunction deleting (0s) 
+@ destroying........
+ -  aws:lambda:Function SupportTriageAgentExecutorFunction deleted (5s) 
+ -  aws:lambda:Function SupportTriageAgentIngresshttpFunction deleted (5s) 
+@ destroying....
+ -  aws:lambda:Function SupportTriageAgentIngressUrlhttpFunction deleted (5s) 
+ -  aws:lambda:Function SupportTriageAgentResumeFunction deleted (5s) 
+ -  sst:sst:LinkRef SupportTriageAgentQueueLinkRef deleting (0s) 
+ -  aws:iam:Role SupportTriageAgentExecutorRole deleting (0s) 
+ -  aws:iam:Role SupportTriageAgentIngressUrlhttpRole deleting (0s) 
+ -  aws:iam:Role SupportTriageAgentResumeRole deleting (0s) 
+ -  aws:iam:Role SupportTriageAgentIngresshttpRole deleting (0s) 
+@ destroying....
+ -  aws:iam:Role SupportTriageAgentExecutorRole deleted (1s) 
+ -  aws:iam:Role SupportTriageAgentIngresshttpRole deleted (1s) 
+ -  aws:iam:Role SupportTriageAgentResumeRole deleted (1s) 
+ -  aws:iam:Role SupportTriageAgentIngressUrlhttpRole deleted (1s) 
+ -  sst:sst:LinkRef SupportTriageAgentDlqLinkRef deleting (0s) 
+ -  sst:sst:LinkRef SupportTriageAgentTableLinkRef deleting (0s) 
+ -  sst:sst:LinkRef SupportTriageAgentBusLinkRef deleting (0s) 
+ -  aws:dynamodb:TableItem SupportTriageAgentManifestSeed deleting (0s) 
+ -  aws:sqs:Queue SupportTriageAgentQueueQueue deleting (0s) 
+ -  aws:dynamodb:TableItem SupportTriageAgentManifestSeed deleted (0.14s) 
+@ destroying.....
+ -  aws:sqs:Queue SupportTriageAgentQueueQueue deleted (1s) 
+ -  aws:cloudwatch:LogGroup SupportTriageAgentIngressUrlhttpLogGroup deleting (0s) 
+ -  aws:cloudwatch:LogGroup SupportTriageAgentExecutorLogGroup deleting (0s) 
+ -  aws:cloudwatch:EventBus SupportTriageAgentBusBus deleting (0s) 
+ -  aws:sqs:Queue SupportTriageAgentDlqQueue deleting (0s) 
+ -  aws:cloudwatch:LogGroup SupportTriageAgentResumeLogGroup deleting (0s) 
+ -  aws:s3:BucketObjectv2 SupportTriageAgentResumeCode deleting (0s) 
+ -  aws:s3:BucketObjectv2 SupportTriageAgentResumeSourcemap0 deleting (0s)[retain] 
+ -  aws:cloudwatch:LogGroup SupportTriageAgentIngresshttpLogGroup deleting (0s) 
+ -  aws:s3:BucketObjectv2 SupportTriageAgentIngressUrlhttpCode deleting (0s) 
+ -  aws:s3:BucketObjectv2 SupportTriageAgentExecutorCode deleting (0s) 
+ -  aws:s3:BucketObjectv2 SupportTriageAgentIngressUrlhttpSourcemap0 deleting (0s)[retain] 
+ -  aws:s3:BucketObjectv2 SupportTriageAgentIngresshttpCode deleting (0s) 
+ -  aws:s3:BucketObjectv2 SupportTriageAgentExecutorSourcemap0 deleting (0s)[retain] 
+ -  aws:s3:BucketObjectv2 SupportTriageAgentIngresshttpSourcemap0 deleting (0s)[retain] 
+ -  aws:dynamodb:Table SupportTriageAgentTableTable deleting (0s) 
+ -  aws:s3:BucketObjectv2 SupportTriageAgentResumeSourcemap0 deleted (0.03s)[retain] 
+ -  aws:s3:BucketObjectv2 SupportTriageAgentIngressUrlhttpSourcemap0 deleted (0.04s)[retain] 
+ -  aws:s3:BucketObjectv2 SupportTriageAgentExecutorSourcemap0 deleted (0.05s)[retain] 
+ -  aws:s3:BucketObjectv2 SupportTriageAgentIngresshttpSourcemap0 deleted (0.05s)[retain] 
+ -  aws:dynamodb:Table SupportTriageAgentTableTable deleting (0s) error:   sdk-v2/provider2.go:572: sdk.helper_schema: deleting AWS DynamoDB Table (draht-reference-playbook-platine-smoke-SupportTriageAgentTableTable-wbrsfcba): operation error DynamoDB: DeleteTable, https response error StatusCode: 400, RequestID: T4LPCA4BEJQJPNLJR314GV9IUBVV4KQNSO5AEMVJF66Q9ASUAAJG, api error ValidationException: Resource cannot be deleted as it is currently protected against deletion. Disable deletion protection first.: provider=aws@7.20.0
+ -  aws:dynamodb:Table SupportTriageAgentTableTable deleting (0s) error: deleting urn:pulumi:platine-smoke::draht-reference-playbook::sst:aws:Dynamo$aws:dynamodb/table:Table::SupportTriageAgentTableTable: 1 error occurred:
+ -  aws:dynamodb:Table SupportTriageAgentTableTable **deleting failed** error: deleting urn:pulumi:platine-smoke::draht-reference-playbook::sst:aws:Dynamo$aws:dynamodb/table:Table::SupportTriageAgentTableTable: 1 error occurred:
+ -  aws:s3:BucketObjectv2 SupportTriageAgentIngressUrlhttpCode deleted (0.12s) 
+ -  aws:s3:BucketObjectv2 SupportTriageAgentExecutorCode deleted (0.13s) 
+ -  aws:s3:BucketObjectv2 SupportTriageAgentResumeCode deleted (0.14s) 
+ -  aws:s3:BucketObjectv2 SupportTriageAgentIngresshttpCode deleted (0.14s) 
+ -  aws:cloudwatch:LogGroup SupportTriageAgentIngresshttpLogGroup deleted (0.17s) 
+ -  aws:cloudwatch:LogGroup SupportTriageAgentResumeLogGroup deleted (0.18s) 
+ -  aws:cloudwatch:LogGroup SupportTriageAgentIngressUrlhttpLogGroup deleted (0.18s) 
+ -  aws:cloudwatch:LogGroup SupportTriageAgentExecutorLogGroup deleted (0.18s) 
+ -  aws:cloudwatch:EventBus SupportTriageAgentBusBus deleted (0.23s) 
+@ destroying.....
+ -  aws:sqs:Queue SupportTriageAgentDlqQueue deleted (1s) 
+    pulumi:pulumi:Stack draht-reference-playbook-platine-smoke  error: update failed
+    pulumi:pulumi:Stack draht-reference-playbook-platine-smoke **failed** 1 error
+Diagnostics:
+  aws:dynamodb:Table (SupportTriageAgentTableTable):
+    error:   sdk-v2/provider2.go:572: sdk.helper_schema: deleting AWS DynamoDB Table (draht-reference-playbook-platine-smoke-SupportTriageAgentTableTable-wbrsfcba): operation error DynamoDB: DeleteTable, https response error StatusCode: 400, RequestID: T4LPCA4BEJQJPNLJR314GV9IUBVV4KQNSO5AEMVJF66Q9ASUAAJG, api error ValidationException: Resource cannot be deleted as it is currently protected against deletion. Disable deletion protection first.: provider=aws@7.20.0
+    error: deleting urn:pulumi:platine-smoke::draht-reference-playbook::sst:aws:Dynamo$aws:dynamodb/table:Table::SupportTriageAgentTableTable: 1 error occurred:
+    	* deleting AWS DynamoDB Table (draht-reference-playbook-platine-smoke-SupportTriageAgentTableTable-wbrsfcba): operation error DynamoDB: DeleteTable, https response error StatusCode: 400, RequestID: T4LPCA4BEJQJPNLJR314GV9IUBVV4KQNSO5AEMVJF66Q9ASUAAJG, api error ValidationException: Resource cannot be deleted as it is currently protected against deletion. Disable deletion protection first.
+
+  pulumi:pulumi:Stack (draht-reference-playbook-platine-smoke):
+    error: update failed
+
+Resources:
+    - 40 deleted
+    2 errored
+
+Duration: 16s
+

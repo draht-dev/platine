@@ -1,0 +1,62 @@
+time=2026-06-18T09:51:52.430+02:00 level=INFO msg="checking for pulumi" path="/Users/exe008/Library/Application Support/sst/bin/pulumi"
+time=2026-06-18T09:51:52.601+02:00 level=INFO msg="checking for bun" path="/Users/exe008/Library/Application Support/sst/bin/bun"
+time=2026-06-18T09:51:52.610+02:00 level=INFO msg="initializing project" version=4.15.2
+time=2026-06-18T09:51:52.611+02:00 level=INFO msg="esbuild building" out=/Users/exe008/draht/platine/examples/reference-playbook/.sst/platform/sst.config.1781769112611.mjs
+time=2026-06-18T09:51:52.628+02:00 level=INFO msg="esbuild built" outfile=/Users/exe008/draht/platine/examples/reference-playbook/.sst/platform/sst.config.1781769112611.mjs
+time=2026-06-18T09:51:52.629+02:00 level=INFO msg="evaluating config"
+time=2026-06-18T09:51:52.655+02:00 level=INFO msg="config evaluated"
+time=2026-06-18T09:51:52.655+02:00 level=INFO msg="checking platform"
+time=2026-06-18T09:51:52.656+02:00 level=INFO msg="loading home"
+time=2026-06-18T09:51:52.656+02:00 level=INFO msg="aws credentials found" region=eu-central-1 profile=default
+time=2026-06-18T09:51:52.656+02:00 level=INFO msg="fetching bootstrap"
+time=2026-06-18T09:51:52.729+02:00 level=INFO msg="found existing bootstrap" data="{\"version\":5,\"asset\":\"sst-asset-veetumecocdr\",\"assetEcrRegistryId\":\"211186746924\",\"assetEcrUrl\":\"211186746924.dkr.ecr.eu-central-1.amazonaws.com/sst-asset\",\"state\":\"sst-state-veetumecocdr\",\"appsyncHttp\":\"\",\"appsyncRealtime\":\"\"}"
+time=2026-06-18T09:51:52.729+02:00 level=INFO msg="loaded config" app=draht-reference-playbook stage=platine-smoke
+time=2026-06-18T09:51:52.729+02:00 level=INFO msg="initializing ui" isTTY=false
+time=2026-06-18T09:51:52.730+02:00 level=INFO msg="server port assigned" port=13559
+time=2026-06-18T09:51:52.730+02:00 level=INFO msg="running stack command" service=project.run cmd=remove
+time=2026-06-18T09:51:52.730+02:00 level=INFO msg=starting service=server
+time=2026-06-18T09:51:52.730+02:00 level=INFO msg="INFO locking app=draht-reference-playbook stage=platine-smoke"
+time=2026-06-18T09:51:52.730+02:00 level=INFO msg="INFO getting data key=lock app=draht-reference-playbook stage=platine-smoke"
+time=2026-06-18T09:51:52.730+02:00 level=INFO msg=server service=server addr=0.0.0.0:13559
+time=2026-06-18T09:51:52.730+02:00 level=INFO msg="server ready to accept connections" service=server
+time=2026-06-18T09:51:52.905+02:00 level=INFO msg="INFO putting update app=draht-reference-playbook stage=platine-smoke"
+time=2026-06-18T09:51:53.009+02:00 level=INFO msg="INFO getting passphrase app=draht-reference-playbook stage=platine-smoke"
+time=2026-06-18T09:51:53.104+02:00 level=INFO msg="INFO pulling state app=draht-reference-playbook stage=platine-smoke out=/Users/exe008/draht/platine/examples/reference-playbook/.sst/pulumi/fe612648f3659b4beddb5bbb/.pulumi/stacks/draht-reference-playbook/platine-smoke.json"
+time=2026-06-18T09:51:53.375+02:00 level=INFO msg="got previous deployment" service=project.run updateID=fe612648f3659b4beddb5bbb
+time=2026-06-18T09:51:53.375+02:00 level=INFO msg="esbuild building" out=/Users/exe008/draht/platine/examples/reference-playbook/.sst/platform/sst.config.1781769113102.mjs
+time=2026-06-18T09:51:53.410+02:00 level=INFO msg="esbuild built" outfile=/Users/exe008/draht/platine/examples/reference-playbook/.sst/platform/sst.config.1781769113102.mjs
+time=2026-06-18T09:51:53.415+02:00 level=INFO msg="built sst.config.ts" service=project.run updateID=fe612648f3659b4beddb5bbb to=/Users/exe008/draht/platine/examples/reference-playbook/.sst/platform/sst.config.1781769113102.mjs
+time=2026-06-18T09:51:53.417+02:00 level=INFO msg="tracked files" service=project.run updateID=fe612648f3659b4beddb5bbb
+time=2026-06-18T09:51:53.417+02:00 level=INFO msg="INFO getting data key=secret app=draht-reference-playbook stage=_fallback"
+time=2026-06-18T09:51:53.417+02:00 level=INFO msg="INFO getting data key=secret app=draht-reference-playbook stage=platine-smoke"
+time=2026-06-18T09:51:53.525+02:00 level=INFO msg="starting pulumi" service=project.run updateID=fe612648f3659b4beddb5bbb args="[/Users/exe008/Library/Application Support/sst/bin/pulumi destroy --yes -f --stack organization/draht-reference-playbook/platine-smoke --non-interactive --event-log /Users/exe008/draht/platine/examples/reference-playbook/.sst/pulumi/fe612648f3659b4beddb5bbb/eventlog.json]"
+time=2026-06-18T09:51:55.768+02:00 level=INFO msg="INFO pushing partial state updateID=fe612648f3659b4beddb5bbb"
+time=2026-06-18T09:51:56.040+02:00 level=INFO msg="INFO pushing partial state updateID=fe612648f3659b4beddb5bbb"
+time=2026-06-18T09:51:56.294+02:00 level=INFO msg="INFO pushing partial state updateID=fe612648f3659b4beddb5bbb"
+time=2026-06-18T09:51:59.428+02:00 level=INFO msg="INFO pushing partial state updateID=fe612648f3659b4beddb5bbb"
+time=2026-06-18T09:52:04.691+02:00 level=INFO msg="INFO pushing partial state updateID=fe612648f3659b4beddb5bbb"
+time=2026-06-18T09:52:04.964+02:00 level=INFO msg="INFO pushing partial state updateID=fe612648f3659b4beddb5bbb"
+time=2026-06-18T09:52:06.255+02:00 level=INFO msg="INFO pushing partial state updateID=fe612648f3659b4beddb5bbb"
+time=2026-06-18T09:52:06.445+02:00 level=INFO msg="INFO pushing partial state updateID=fe612648f3659b4beddb5bbb"
+time=2026-06-18T09:52:06.625+02:00 level=INFO msg="INFO pushing partial state updateID=fe612648f3659b4beddb5bbb"
+time=2026-06-18T09:52:08.282+02:00 level=INFO msg="INFO pushing partial state updateID=fe612648f3659b4beddb5bbb"
+time=2026-06-18T09:52:08.383+02:00 level=INFO msg="telemetry tracking error" service=project.run updateID=fe612648f3659b4beddb5bbb
+time=2026-06-18T09:52:08.471+02:00 level=INFO msg="INFO pushing partial state updateID=fe612648f3659b4beddb5bbb"
+time=2026-06-18T09:52:08.605+02:00 level=INFO msg="INFO pushing partial state updateID=fe612648f3659b4beddb5bbb"
+time=2026-06-18T09:52:10.118+02:00 level=INFO msg="INFO pushing partial state updateID=fe612648f3659b4beddb5bbb"
+time=2026-06-18T09:52:10.125+02:00 level=INFO msg="pulumi exited" service=project.run updateID=fe612648f3659b4beddb5bbb err="exit status 255"
+time=2026-06-18T09:52:10.125+02:00 level=INFO msg="eof and exited" service=project.run updateID=fe612648f3659b4beddb5bbb eofs=0
+time=2026-06-18T09:52:10.125+02:00 level=INFO msg="eof and exited" service=project.run updateID=fe612648f3659b4beddb5bbb eofs=1
+time=2026-06-18T09:52:10.125+02:00 level=INFO msg="breaking out of tail loop" service=project.run updateID=fe612648f3659b4beddb5bbb
+time=2026-06-18T09:52:10.125+02:00 level=INFO msg="parsing state" service=project.run updateID=fe612648f3659b4beddb5bbb
+time=2026-06-18T09:52:10.126+02:00 level=INFO msg="generating types" root=/Users/exe008/draht/platine/examples/reference-playbook
+time=2026-06-18T09:52:10.127+02:00 level=INFO msg="canceling partial" service=project.run updateID=fe612648f3659b4beddb5bbb
+time=2026-06-18T09:52:10.127+02:00 level=INFO msg="waiting for partial to exit" service=project.run updateID=fe612648f3659b4beddb5bbb
+time=2026-06-18T09:52:10.249+02:00 level=INFO msg="INFO pushing snapshot updateID=fe612648f3659b4beddb5bbb"
+time=2026-06-18T09:52:10.249+02:00 level=INFO msg="INFO pushing eventlog updateID=fe612648f3659b4beddb5bbb"
+time=2026-06-18T09:52:10.485+02:00 level=INFO msg="INFO putting update app=draht-reference-playbook stage=platine-smoke"
+time=2026-06-18T09:52:10.582+02:00 level=INFO msg="done running stack command" service=project.run updateID=fe612648f3659b4beddb5bbb resources=16
+time=2026-06-18T09:52:10.593+02:00 level=INFO msg="INFO unlocking app=draht-reference-playbook stage=platine-smoke"
+time=2026-06-18T09:52:10.687+02:00 level=INFO msg="shutting down server" service=server
+time=2026-06-18T09:52:10.688+02:00 level=INFO msg="server done" service=server
+time=2026-06-18T09:52:10.688+02:00 level=ERROR msg="exited with error" err="stack run had errors"

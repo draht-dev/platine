@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@draht/core": "workspace:*",
+    "@draht/runtime-aws": "workspace:*",
     "@draht/sst": "workspace:*",
     "zod": "^3.25.76"
   },

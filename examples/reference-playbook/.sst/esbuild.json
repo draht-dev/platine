@@ -1,0 +1,1816 @@
+
+  .sst/platform/sst.config.1781769113102.mjs ────────────────────────────────────────── 1.5mb ─ 100.0%
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/schemas.js ──────── 56.0kb ─── 3.7%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/router.ts ────────────────────────────────────── 53.3kb ─── 3.5%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/components/aws/function.ts ──────────────────────────────────── 46.7kb ─── 3.1%
+   │  └ .sst/platform/src/auto/run.ts
+   │     └ eval.ts
+   ├ .sst/platform/src/components/aws/ssr-site.ts ──────────────────────────────────── 44.7kb ─── 2.9%
+   │  └ .sst/platform/src/components/aws/svelte-kit.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/service.ts ───────────────────────────────────── 41.1kb ─── 2.7%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/vpc.ts ───────────────────────────────────────── 39.1kb ─── 2.6%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/schemas.js ───── 32.8kb ─── 2.2%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │           └ ../../packages/core/src/manifest/json-schema.ts
+   │              └ ../../packages/core/src/manifest/index.ts
+   │                 └ ../../packages/manifest/src/index.ts
+   │                    └ ../../packages/sst/dist/index.js
+   │                       └ sst.ts
+   │                          └ sst.config.ts
+   │                             └ eval.ts
+   ├ .sst/platform/src/components/aws/bucket.ts ────────────────────────────────────── 29.6kb ─── 1.9%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/apigatewayv1.ts ──────────────────────────────── 28.8kb ─── 1.9%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/to-json-schema.js ─ 27.0kb ─── 1.8%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/service-v1.ts ────────────────────────────────── 26.0kb ─── 1.7%
+   │  └ .sst/platform/src/components/aws/cluster-v1.ts
+   │     └ .sst/platform/src/components/aws/cluster.ts
+   │        └ .sst/platform/src/components/aws/index.ts
+   │           └ .sst/platform/src/components/index.ts
+   │              └ sst.config.ts
+   │                 └ eval.ts
+   ├ .sst/platform/src/components/aws/apigatewayv2.ts ──────────────────────────────── 22.8kb ─── 1.5%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/aurora.ts ────────────────────────────────────── 21.5kb ─── 1.4%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/static-site.ts ───────────────────────────────── 18.5kb ─── 1.2%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/postgres.ts ──────────────────────────────────── 18.4kb ─── 1.2%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/worker.ts ─────────────────────────────── 18.3kb ─── 1.2%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/step-functions.ts ────────────────────────────── 18.3kb ─── 1.2%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/checks.js ───────── 18.2kb ─── 1.2%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/api.js ──────────── 18.0kb ─── 1.2%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/mysql.ts ─────────────────────────────────────── 17.9kb ─── 1.2%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/component.ts ─────────────────────────────────────── 17.8kb ─── 1.2%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/components/aws/nextjs.ts ────────────────────────────────────── 17.5kb ─── 1.2%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/fargate.ts ───────────────────────────────────── 16.6kb ─── 1.1%
+   │  └ .sst/platform/src/components/aws/task.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/cognito-user-pool.ts ─────────────────────────── 15.9kb ─── 1.0%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/apigateway-websocket.ts ──────────────────────── 15.5kb ─── 1.0%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/util.js ─────────── 14.5kb ─── 1.0%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/en.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/vpc-v1.ts ────────────────────────────────────── 13.8kb ─── 0.9%
+   │  └ .sst/platform/src/components/aws/vpc.ts
+   │     └ .sst/platform/src/components/aws/function.ts
+   │        └ .sst/platform/src/auto/run.ts
+   │           └ eval.ts
+   ├ ../../packages/sst/dist/index.js ──────────────────────────────────────────────── 12.6kb ─── 0.8%
+   │  └ sst.ts
+   │     └ sst.config.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/components/aws/dsql.ts ──────────────────────────────────────── 12.5kb ─── 0.8%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/redis.ts ─────────────────────────────────────── 12.4kb ─── 0.8%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/cluster.ts ───────────────────────────────────── 11.2kb ─── 0.7%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/bus.ts ───────────────────────────────────────── 10.5kb ─── 0.7%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/open-search.ts ────────────────────────────────── 9.7kb ─── 0.6%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/alb.ts ────────────────────────────────────────── 9.6kb ─── 0.6%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/dynamo.ts ─────────────────────────────────────── 9.5kb ─── 0.6%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/app-sync.ts ───────────────────────────────────── 9.5kb ─── 0.6%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/queue.ts ──────────────────────────────────────── 9.5kb ─── 0.6%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ru.js ─────────── 9.5kb ─── 0.6%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/cognito-identity-pool.ts ──────────────────────── 9.4kb ─── 0.6%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/be.js ─────────── 9.2kb ─── 0.6%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/redis-v1.ts ───────────────────────────────────── 8.9kb ─── 0.6%
+   │  └ .sst/platform/src/components/aws/redis.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/sns-topic.ts ──────────────────────────────────── 8.8kb ─── 0.6%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../packages/core/src/manifest/schema.ts ─────────────────────────────────────── 8.8kb ─── 0.6%
+   │  └ ../../packages/core/src/manifest/index.ts
+   │     └ ../../packages/manifest/src/index.ts
+   │        └ ../../packages/sst/dist/index.js
+   │           └ sst.ts
+   │              └ sst.config.ts
+   │                 └ eval.ts
+   ├ .sst/platform/src/components/aws/task.ts ───────────────────────────────────────── 8.5kb ─── 0.6%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/postgres-v1.ts ────────────────────────────────── 8.5kb ─── 0.6%
+   │  └ .sst/platform/src/components/aws/vector.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/cron-v2.ts ────────────────────────────────────── 8.5kb ─── 0.6%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ta.js ─────────── 8.5kb ─── 0.6%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/th.js ─────────── 8.5kb ─── 0.6%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ua.js ─────────── 8.3kb ─── 0.5%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/kh.js ─────────── 8.3kb ─── 0.5%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/email.ts ──────────────────────────────────────── 8.1kb ─── 0.5%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/index.js ─────────── 8.0kb ─── 0.5%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │           └ ../../packages/core/src/manifest/json-schema.ts
+   │              └ ../../packages/core/src/manifest/index.ts
+   │                 └ ../../packages/manifest/src/index.ts
+   │                    └ ../../packages/sst/dist/index.js
+   │                       └ sst.ts
+   │                          └ sst.config.ts
+   │                             └ eval.ts
+   ├ .sst/platform/src/components/aws/cdn.ts ────────────────────────────────────────── 7.8kb ─── 0.5%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ur.js ─────────── 7.8kb ─── 0.5%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/bucket-notification.ts ────────────────────────── 7.5kb ─── 0.5%
+   │  └ .sst/platform/src/components/aws/bucket.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/mk.js ─────────── 7.5kb ─── 0.5%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ar.js ─────────── 7.5kb ─── 0.5%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/ssr-site.ts ────────────────────────────── 7.3kb ─── 0.5%
+   │  └ .sst/platform/src/components/cloudflare/tan-stack-start.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/fa.js ─────────── 7.1kb ─── 0.5%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/efs.ts ────────────────────────────────────────── 7.1kb ─── 0.5%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/components/aws/vector.ts ─────────────────────────────────────── 6.9kb ─── 0.5%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/app-sync-data-source.ts ───────────────────────── 6.9kb ─── 0.5%
+   │  └ .sst/platform/src/components/aws/app-sync.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/he.js ─────────── 6.8kb ─── 0.4%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/static-site.ts ─────────────────────────── 6.8kb ─── 0.4%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ps.js ─────────── 6.5kb ─── 0.4%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/cron.ts ───────────────────────────────────────── 6.4kb ─── 0.4%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js ───── 6.3kb ─── 0.4%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │        └ ../../packages/core/src/manifest/json-schema.ts
+   │           └ ../../packages/core/src/manifest/index.ts
+   │              └ ../../packages/manifest/src/index.ts
+   │                 └ ../../packages/sst/dist/index.js
+   │                    └ sst.ts
+   │                       └ sst.config.ts
+   │                          └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ja.js ─────────── 5.8kb ─── 0.4%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ko.js ─────────── 5.7kb ─── 0.4%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/regexes.js ───────── 5.7kb ─── 0.4%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/cs.js ─────────── 5.4kb ─── 0.4%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/https-redirect.ts ─────────────────────────────── 5.3kb ─── 0.4%
+   │  └ .sst/platform/src/components/aws/cdn.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/pl.js ─────────── 5.2kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/zh-TW.js ──────── 5.2kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/vi.js ─────────── 5.2kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/link.ts ───────────────────────────────────────────── 5.1kb ─── 0.3%
+   │  └ .sst/platform/src/auto/run.ts
+   │     └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/zh-CN.js ──────── 5.1kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/realtime.ts ───────────────────────────────────── 5.0kb ─── 0.3%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/tan-stack-start.ts ─────────────────────── 5.0kb ─── 0.3%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/hu.js ─────────── 4.9kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/az.js ─────────── 4.9kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ca.js ─────────── 4.9kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/fi.js ─────────── 4.9kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/step-functions/state.ts ───────────────────────── 4.9kb ─── 0.3%
+   │  └ .sst/platform/src/components/aws/step-functions/wait.ts
+   │     └ .sst/platform/src/components/aws/step-functions.ts
+   │        └ .sst/platform/src/components/aws/index.ts
+   │           └ .sst/platform/src/components/index.ts
+   │              └ sst.config.ts
+   │                 └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/errors.js ────────── 4.8kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ota.js ────────── 4.8kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/auth.ts ───────────────────────────────────────── 4.8kb ─── 0.3%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/helpers/wrangler.ts ────────────────────── 4.8kb ─── 0.3%
+   │  └ .sst/platform/src/components/cloudflare/ssr-site.ts
+   │     └ .sst/platform/src/components/cloudflare/tan-stack-start.ts
+   │        └ .sst/platform/src/components/cloudflare/index.ts
+   │           └ .sst/platform/src/components/index.ts
+   │              └ sst.config.ts
+   │                 └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/es.js ─────────── 4.8kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/hyperdrive.ts ──────────────────────────── 4.8kb ─── 0.3%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/kinesis-stream.ts ─────────────────────────────── 4.7kb ─── 0.3%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/sv.js ─────────── 4.7kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/remix.ts ──────────────────────────────────────── 4.7kb ─── 0.3%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/tr.js ─────────── 4.7kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/it.js ─────────── 4.7kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/fr-CA.js ──────── 4.6kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/fr.js ─────────── 4.6kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/sl.js ─────────── 4.6kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/pt.js ─────────── 4.6kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/id.js ─────────── 4.6kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/de.js ─────────── 4.6kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/eo.js ─────────── 4.6kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/no.js ─────────── 4.5kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/ms.js ─────────── 4.5kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/apigateway-websocket-route.ts ─────────────────── 4.5kb ─── 0.3%
+   │  └ .sst/platform/src/components/aws/apigateway-websocket.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/apigatewayv2-authorizer.ts ────────────────────── 4.4kb ─── 0.3%
+   │  └ .sst/platform/src/components/aws/apigateway-websocket.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/nl.js ─────────── 4.4kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/en.js ─────────── 4.4kb ─── 0.3%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │           └ ../../packages/core/src/manifest/json-schema.ts
+   │              └ ../../packages/core/src/manifest/index.ts
+   │                 └ ../../packages/manifest/src/index.ts
+   │                    └ ../../packages/sst/dist/index.js
+   │                       └ sst.ts
+   │                          └ sst.config.ts
+   │                             └ eval.ts
+   ├ .sst/platform/src/components/aws/cluster-v1.ts ─────────────────────────────────── 4.2kb ─── 0.3%
+   │  └ .sst/platform/src/components/aws/cluster.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/helpers/arn.ts ────────────────────────────────── 4.2kb ─── 0.3%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/static-site-v2.ts ──────────────────────── 4.1kb ─── 0.3%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/apigatewayv1-authorizer.ts ────────────────────── 4.1kb ─── 0.3%
+   │  └ .sst/platform/src/components/aws/apigatewayv1.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/linkable.ts ───────────────────────────────────────── 4.1kb ─── 0.3%
+   │  └ .sst/platform/src/components/index.ts
+   │     └ sst.config.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/components/aws/tan-stack-start.ts ────────────────────────────── 4.0kb ─── 0.3%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/apigatewayv1-lambda-route.ts ──────────────────── 3.9kb ─── 0.3%
+   │  └ .sst/platform/src/components/aws/apigatewayv1.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/react.ts ──────────────────────────────────────── 3.8kb ─── 0.3%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/kv.ts ──────────────────────────────────── 3.8kb ─── 0.3%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/queue.ts ───────────────────────────────── 3.6kb ─── 0.2%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/astro.ts ───────────────────────────────── 3.6kb ─── 0.2%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/bucket-lambda-subscriber.ts ───────────────────── 3.6kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/bucket.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/workflow.ts ────────────────────────────── 3.5kb ─── 0.2%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/step-functions/parallel.ts ────────────────────── 3.4kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/step-functions.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/rpc/rpc.ts ────────────────────────────────────────── 3.3kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/components/aws/step-functions/task.ts ────────────────────────── 3.2kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/step-functions.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/apigatewayv2-lambda-route.ts ──────────────────── 3.2kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/apigatewayv2.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/queue-lambda-subscriber.ts ────────────────────── 3.2kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/queue.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/base/base-ssr-site.ts ─────────────────────────────── 3.2kb ─── 0.2%
+   │  └ .sst/platform/src/components/cloudflare/ssr-site.ts
+   │     └ .sst/platform/src/components/cloudflare/tan-stack-start.ts
+   │        └ .sst/platform/src/components/cloudflare/index.ts
+   │           └ .sst/platform/src/components/index.ts
+   │              └ sst.config.ts
+   │                 └ eval.ts
+   ├ .sst/platform/src/components/aws/bucket-topic-subscriber.ts ────────────────────── 3.2kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/bucket.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/helpers/function-builder.ts ───────────────────── 3.2kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/step-functions.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/d1.ts ──────────────────────────────────── 3.1kb ─── 0.2%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/kinesis-stream-lambda-subscriber.ts ───────────── 3.1kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/kinesis-stream.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/rate-limit.ts ──────────────────────────── 3.0kb ─── 0.2%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/step-functions/map.ts ─────────────────────────── 3.0kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/step-functions.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/base/base-static-site.ts ──────────────────────────── 3.0kb ─── 0.2%
+   │  └ .sst/platform/src/components/cloudflare/static-site-v2.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/bus-lambda-subscriber.ts ──────────────────────── 2.9kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/bus.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/workflow.ts ───────────────────────────────────── 2.9kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/step-functions/choice.ts ──────────────────────── 2.9kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/step-functions.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/svelte-kit.ts ─────────────────────────────────── 2.8kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/realtime-lambda-subscriber.ts ─────────────────── 2.8kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/realtime.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/sns-topic-lambda-subscriber.ts ────────────────── 2.8kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/sns-topic.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/index.ts ──────────────────────────────────────── 2.8kb ─── 0.2%
+   │  └ .sst/platform/src/components/index.ts
+   │     └ sst.config.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/components/aws/astro.ts ──────────────────────────────────────── 2.8kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/dynamo-lambda-subscriber.ts ───────────────────── 2.8kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/dynamo.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/queue-worker-subscriber.ts ─────────────── 2.7kb ─── 0.2%
+   │  └ .sst/platform/src/components/cloudflare/queue.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/function.js ──────── 2.6kb ─── 0.2%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/parse.js ─────────── 2.6kb ─── 0.2%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/dns.ts ────────────────────────────────────────── 2.6kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/cognito-user-pool-client.ts ───────────────────── 2.5kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/cognito-user-pool.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/dns-validated-certificate.ts ──────────────────── 2.5kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/bucket-queue-subscriber.ts ────────────────────── 2.5kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/bucket.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/experimental/solid-start.ts ────────────── 2.5kb ─── 0.2%
+   │  └ .sst/platform/src/components/cloudflare/experimental/index.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/auto/run.ts ──────────────────────────────────────────────────── 2.4kb ─── 0.2%
+   │  └ eval.ts
+   ├ .sst/platform/src/components/aws/app-sync-resolver.ts ──────────────────────────── 2.4kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/app-sync.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/cron.ts ────────────────────────────────── 2.4kb ─── 0.2%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/providers/kv-data.ts ───────────────────── 2.3kb ─── 0.2%
+   │  └ .sst/platform/src/components/cloudflare/static-site.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/base/base-site.ts ─────────────────────────────────── 2.3kb ─── 0.2%
+   │  └ .sst/platform/src/components/cloudflare/static-site.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/apigatewayv1-usage-plan.ts ────────────────────── 2.3kb ─── 0.2%
+   │  └ .sst/platform/src/components/aws/apigatewayv1.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/cognito-identity-provider.ts ──────────────────── 2.2kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/cognito-user-pool.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/providers/worker-url.ts ────────────────── 2.2kb ─── 0.1%
+   │  └ .sst/platform/src/components/cloudflare/worker.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/solid-start.ts ────────────────────────────────── 2.2kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/react-router.ts ────────────────────────── 2.2kb ─── 0.1%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/apigatewayv1-integration-route.ts ─────────────── 2.1kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/apigatewayv1.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/bucket.ts ──────────────────────────────── 2.1kb ─── 0.1%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/sns-topic-queue-subscriber.ts ─────────────────── 2.1kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/sns-topic.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/opencontrol.ts ────────────────────────────────── 2.1kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/bus-queue-subscriber.ts ───────────────────────── 2.0kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/bus.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/helpers/validation.ts ──────────────────── 2.0kb ─── 0.1%
+   │  └ .sst/platform/src/components/cloudflare/tan-stack-start.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/core.js ──────────── 1.9kb ─── 0.1%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/apigatewayv2-private-route.ts ─────────────────── 1.9kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/apigatewayv2.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/analog.ts ─────────────────────────────────────── 1.9kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/providers/zone-lookup.ts ───────────────── 1.8kb ─── 0.1%
+   │  └ .sst/platform/src/components/cloudflare/worker.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/providers/worker-placement.ts ──────────── 1.8kb ─── 0.1%
+   │  └ .sst/platform/src/components/cloudflare/worker.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/router-url-route.ts ───────────────────────────── 1.8kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/router.ts
+   │     └ .sst/platform/src/components/aws/function.ts
+   │        └ .sst/platform/src/auto/run.ts
+   │           └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/locales/index.js ──────── 1.8kb ─── 0.1%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │           └ ../../packages/core/src/manifest/json-schema.ts
+   │              └ ../../packages/core/src/manifest/index.ts
+   │                 └ ../../packages/manifest/src/index.ts
+   │                    └ ../../packages/sst/dist/index.js
+   │                       └ sst.ts
+   │                          └ sst.config.ts
+   │                             └ eval.ts
+   ├ .sst/platform/src/components/aws/apigatewayv2-url-route.ts ─────────────────────── 1.8kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/apigatewayv2.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/naming.ts ─────────────────────────────────────────── 1.7kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/registries.js ────── 1.7kb ─── 0.1%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/nuxt.ts ───────────────────────────────────────── 1.7kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/app-sync-function.ts ──────────────────────────── 1.6kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/app-sync.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/helpers/apigateway-account.ts ─────────────────── 1.5kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/apigateway-websocket.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/iso.js ────────── 1.5kb ─── 0.1%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │           └ ../../packages/core/src/manifest/json-schema.ts
+   │              └ ../../packages/core/src/manifest/index.ts
+   │                 └ ../../packages/manifest/src/index.ts
+   │                    └ ../../packages/sst/dist/index.js
+   │                       └ sst.ts
+   │                          └ sst.config.ts
+   │                             └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/auth.ts ────────────────────────────────── 1.5kb ─── 0.1%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/apigatewayv1-api-key.ts ───────────────────────── 1.5kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/apigatewayv1-usage-plan.ts
+   │     └ .sst/platform/src/components/aws/apigatewayv1.ts
+   │        └ .sst/platform/src/components/aws/index.ts
+   │           └ .sst/platform/src/components/index.ts
+   │              └ sst.config.ts
+   │                 └ eval.ts
+   ├ .sst/platform/src/components/aws/auth-v1.ts ────────────────────────────────────── 1.5kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/auth.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/apigatewayv1-base-route.ts ────────────────────── 1.4kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/apigatewayv1-integration-route.ts
+   │     └ .sst/platform/src/components/aws/apigatewayv1.ts
+   │        └ .sst/platform/src/components/aws/index.ts
+   │           └ .sst/platform/src/components/index.ts
+   │              └ sst.config.ts
+   │                 └ eval.ts
+   ├ sst.ts ─────────────────────────────────────────────────────────────────────────── 1.3kb ─── 0.1%
+   │  └ sst.config.ts
+   │     └ eval.ts
+   ├ .sst/platform/src/components/aws/router-bucket-route.ts ────────────────────────── 1.3kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/router.ts
+   │     └ .sst/platform/src/components/aws/function.ts
+   │        └ .sst/platform/src/auto/run.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/router-base-route.ts ──────────────────────────── 1.3kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/router-bucket-route.ts
+   │     └ .sst/platform/src/components/aws/router.ts
+   │        └ .sst/platform/src/components/aws/function.ts
+   │           └ .sst/platform/src/auto/run.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/helpers/fetch.ts ───────────────────────── 1.3kb ─── 0.1%
+   │  └ .sst/platform/src/components/cloudflare/worker.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/durable-object.ts ──────────────────────── 1.2kb ─── 0.1%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../packages/core/src/manifest/validate.ts ───────────────────────────────────── 1.2kb ─── 0.1%
+   │  └ ../../packages/core/src/manifest/index.ts
+   │     └ ../../packages/manifest/src/index.ts
+   │        └ ../../packages/sst/dist/index.js
+   │           └ sst.ts
+   │              └ sst.config.ts
+   │                 └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/doc.js ───────────── 1.2kb ─── 0.1%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/aws/apigatewayv2-base-route.ts ────────────────────── 1.2kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/apigatewayv2-private-route.ts
+   │     └ .sst/platform/src/components/aws/apigatewayv2.ts
+   │        └ .sst/platform/src/components/aws/index.ts
+   │           └ .sst/platform/src/components/index.ts
+   │              └ sst.config.ts
+   │                 └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/errors.js ─────── 1.2kb ─── 0.1%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │           └ ../../packages/core/src/manifest/json-schema.ts
+   │              └ ../../packages/core/src/manifest/index.ts
+   │                 └ ../../packages/manifest/src/index.ts
+   │                    └ ../../packages/sst/dist/index.js
+   │                       └ sst.ts
+   │                          └ sst.config.ts
+   │                             └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/ai.ts ──────────────────────────────────── 1.2kb ─── 0.1%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/step-functions/wait.ts ────────────────────────── 1.2kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/step-functions.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/helpers/worker-builder.ts ──────────────── 1.1kb ─── 0.1%
+   │  └ .sst/platform/src/components/cloudflare/cron.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/helpers/compatibility.ts ───────────────── 1.1kb ─── 0.1%
+   │  └ .sst/platform/src/components/cloudflare/worker.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/duration.ts ───────────────────────────────────────── 1.1kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ <define:$cli> ──────────────────────────────────────────────────────────────────── 1.1kb ─── 0.1%
+   │  └ eval.ts
+   ├ .sst/platform/src/components/aws/helpers/provider.ts ───────────────────────────── 1.1kb ─── 0.1%
+   │  └ .sst/platform/src/components/aws/router.ts
+   │     └ .sst/platform/src/components/aws/function.ts
+   │        └ .sst/platform/src/auto/run.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/experimental/dev-command.ts ──────────────────────── 1013b ──── 0.1%
+   │  └ .sst/platform/src/components/experimental/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/helpers/site-builder.ts ──────────────────────── 1011b ──── 0.1%
+   │  └ .sst/platform/src/components/base/base-static-site.ts
+   │     └ .sst/platform/src/components/cloudflare/static-site-v2.ts
+   │        └ .sst/platform/src/components/cloudflare/index.ts
+   │           └ .sst/platform/src/components/index.ts
+   │              └ sst.config.ts
+   │                 └ eval.ts
+   ├ .sst/platform/src/components/aws/bus-base-subscriber.ts ────────────────────────── 973b ──── 0.1%
+   │  └ .sst/platform/src/components/aws/bus-queue-subscriber.ts
+   │     └ .sst/platform/src/components/aws/bus.ts
+   │        └ .sst/platform/src/components/aws/index.ts
+   │           └ .sst/platform/src/components/index.ts
+   │              └ sst.config.ts
+   │                 └ eval.ts
+   ├ .sst/platform/src/components/aws/step-functions/pass.ts ────────────────────────── 891b ──── 0.1%
+   │  └ .sst/platform/src/components/aws/step-functions.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/helpers/container-builder.ts ──────────────────── 856b ──── 0.1%
+   │  └ .sst/platform/src/components/aws/fargate.ts
+   │     └ .sst/platform/src/components/aws/task.ts
+   │        └ .sst/platform/src/components/aws/index.ts
+   │           └ .sst/platform/src/components/index.ts
+   │              └ sst.config.ts
+   │                 └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/compat.js ─────── 804b ──── 0.1%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │           └ ../../packages/core/src/manifest/json-schema.ts
+   │              └ ../../packages/core/src/manifest/index.ts
+   │                 └ ../../packages/manifest/src/index.ts
+   │                    └ ../../packages/sst/dist/index.js
+   │                       └ sst.ts
+   │                          └ sst.config.ts
+   │                             └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/coerce.js ─────── 796b ──── 0.1%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │           └ ../../packages/core/src/manifest/json-schema.ts
+   │              └ ../../packages/core/src/manifest/index.ts
+   │                 └ ../../packages/manifest/src/index.ts
+   │                    └ ../../packages/sst/dist/index.js
+   │                       └ sst.ts
+   │                          └ sst.config.ts
+   │                             └ eval.ts
+   ├ .sst/platform/src/components/size.ts ───────────────────────────────────────────── 786b ──── 0.1%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/util/semaphore.ts ────────────────────────────────────────────── 758b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/helpers/site-builder.ts
+   │     └ .sst/platform/src/components/base/base-static-site.ts
+   │        └ .sst/platform/src/components/cloudflare/static-site-v2.ts
+   │           └ .sst/platform/src/components/cloudflare/index.ts
+   │              └ .sst/platform/src/components/index.ts
+   │                 └ sst.config.ts
+   │                    └ eval.ts
+   ├ .sst/platform/src/util/compare-semver.ts ───────────────────────────────────────── 723b ──── 0.0%
+   │  └ .sst/platform/src/components/cloudflare/astro.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/logging.ts ────────────────────────────────────── 707b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/components/aws/helpers/subscriber.ts ─────────────────────────── 692b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/sns-topic.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ sst.config.ts ──────────────────────────────────────────────────────────────────── 652b ──── 0.0%
+   │  └ eval.ts
+   ├ .sst/platform/src/components/aws/linkable.ts ───────────────────────────────────── 642b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/providers/distribution-deployment-waiter.ts ───── 628b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/cdn.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/providers/distribution-invalidation.ts ────────── 602b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/static-site.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/index.ts ───────────────────────────────── 599b ──── 0.0%
+   │  └ .sst/platform/src/components/index.ts
+   │     └ sst.config.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/components/aws/step-functions/fail.ts ────────────────────────── 598b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/step-functions.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/providers/function-environment-update.ts ──────── 597b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/components/aws/providers/hosted-zone-lookup.ts ───────────────── 579b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/dns.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/providers/origin-access-control.ts ────────────── 574b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/router.ts
+   │     └ .sst/platform/src/components/aws/function.ts
+   │        └ .sst/platform/src/auto/run.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/util/package.ts ──────────────────────────────────────────────── 574b ──── 0.0%
+   │  └ .sst/platform/src/components/cloudflare/astro.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/iam-edit.ts ───────────────────────────────────── 566b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/parse.js ──────── 548b ──── 0.0%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │           └ ../../packages/core/src/manifest/json-schema.ts
+   │              └ ../../packages/core/src/manifest/index.ts
+   │                 └ ../../packages/manifest/src/index.ts
+   │                    └ ../../packages/sst/dist/index.js
+   │                       └ sst.ts
+   │                          └ sst.config.ts
+   │                             └ eval.ts
+   ├ .sst/platform/src/components/aws/step-functions/succeed.ts ─────────────────────── 545b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/step-functions.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/providers/kv-routes-update.ts ─────────────────── 544b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/components/aws/providers/rds-role-lookup.ts ──────────────────── 538b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/mysql.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/providers/vector-table.ts ─────────────────────── 526b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/vector.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/aws/providers/bucket-files.ts ─────────────────────── 524b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/static-site.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ <define:$app> ──────────────────────────────────────────────────────────────────── 484b ──── 0.0%
+   │  └ eval.ts
+   ├ .sst/platform/src/components/aws/providers/kv-keys.ts ──────────────────────────── 444b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/shim/run.js ──────────────────────────────────────────────────── 432b ──── 0.0%
+   ├ .sst/platform/src/util/minify.ts ───────────────────────────────────────────────── 398b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/router.ts
+   │     └ .sst/platform/src/components/aws/function.ts
+   │        └ .sst/platform/src/auto/run.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/helpers/load-balancer.ts ──────────────────────── 380b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/service.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/cpu.ts ────────────────────────────────────────────── 358b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/fargate.ts
+   │     └ .sst/platform/src/components/aws/task.ts
+   │        └ .sst/platform/src/components/aws/index.ts
+   │           └ .sst/platform/src/components/index.ts
+   │              └ sst.config.ts
+   │                 └ eval.ts
+   ├ .sst/platform/src/components/index.ts ──────────────────────────────────────────── 351b ──── 0.0%
+   │  └ sst.config.ts
+   │     └ eval.ts
+   ├ .sst/platform/src/util/warn.ts ─────────────────────────────────────────────────── 345b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/components/aws/helpers/bootstrap.ts ──────────────────────────── 332b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/util/lazy.ts ─────────────────────────────────────────────────── 332b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/binding.ts ─────────────────────────────── 308b ──── 0.0%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/versions.js ──────── 300b ──── 0.0%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/error.ts ──────────────────────────────────────────── 300b ──── 0.0%
+   │  └ .sst/platform/src/auto/run.ts
+   │     └ eval.ts
+   ├ ../../packages/core/src/manifest/index.ts ──────────────────────────────────────── 298b ──── 0.0%
+   │  └ ../../packages/manifest/src/index.ts
+   │     └ ../../packages/sst/dist/index.js
+   │        └ sst.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/util/fs.ts ───────────────────────────────────────────────────── 282b ──── 0.0%
+   │  └ .sst/platform/src/components/cloudflare/tan-stack-start.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/components/vercel/dns.ts ─────────────────────────────────────── 273b ──── 0.0%
+   │  └ .sst/platform/src/components/vercel/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/account-id.ts ──────────────────────────── 272b ──── 0.0%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/dns.ts ─────────────────────────────────── 271b ──── 0.0%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/aws/permission.ts ─────────────────────────────────── 261b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/function.ts
+   │     └ .sst/platform/src/auto/run.ts
+   │        └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js ──────── 259b ──── 0.0%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │     └ ../../packages/core/src/manifest/json-schema.ts
+   │        └ ../../packages/core/src/manifest/index.ts
+   │           └ ../../packages/manifest/src/index.ts
+   │              └ ../../packages/sst/dist/index.js
+   │                 └ sst.ts
+   │                    └ sst.config.ts
+   │                       └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/experimental/index.ts ──────────────────── 259b ──── 0.0%
+   │  └ .sst/platform/src/components/cloudflare/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ .sst/platform/src/components/path.ts ───────────────────────────────────────────── 258b ──── 0.0%
+   │  └ .sst/platform/src/components/aws/static-site.ts
+   │     └ .sst/platform/src/components/aws/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/json-schema.js ───── 254b ──── 0.0%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/core/index.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │           └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │              └ ../../packages/core/src/manifest/json-schema.ts
+   │                 └ ../../packages/core/src/manifest/index.ts
+   │                    └ ../../packages/manifest/src/index.ts
+   │                       └ ../../packages/sst/dist/index.js
+   │                          └ sst.ts
+   │                             └ sst.config.ts
+   │                                └ eval.ts
+   ├ .sst/platform/src/components/vercel/account-id.ts ──────────────────────────────── 248b ──── 0.0%
+   │  └ .sst/platform/src/components/vercel/index.ts
+   │     └ .sst/platform/src/components/index.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../packages/core/src/manifest/version.ts ────────────────────────────────────── 239b ──── 0.0%
+   │  └ ../../packages/core/src/manifest/index.ts
+   │     └ ../../packages/manifest/src/index.ts
+   │        └ ../../packages/sst/dist/index.js
+   │           └ sst.ts
+   │              └ sst.config.ts
+   │                 └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/checks.js ─────── 236b ──── 0.0%
+   │  └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/external.js
+   │     └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/classic/index.js
+   │        └ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js
+   │           └ ../../packages/core/src/manifest/json-schema.ts
+   │              └ ../../packages/core/src/manifest/index.ts
+   │                 └ ../../packages/manifest/src/index.ts
+   │                    └ ../../packages/sst/dist/index.js
+   │                       └ sst.ts
+   │                          └ sst.config.ts
+   │                             └ eval.ts
+   ├ .sst/platform/src/components/secret.ts ─────────────────────────────────────────── 234b ──── 0.0%
+   │  └ .sst/platform/src/components/index.ts
+   │     └ sst.config.ts
+   │        └ eval.ts
+   ├ ../../node_modules/.pnpm/zod@3.25.76/node_modules/zod/v4/index.js ──────────────── 224b ──── 0.0%
+   │  └ ../../packages/core/src/manifest/json-schema.ts
+   │     └ ../../packages/core/src/manifest/index.ts
+   │        └ ../../packages/manifest/src/index.ts
+   │           └ ../../packages/sst/dist/index.js
+   │              └ sst.ts
+   │                 └ sst.config.ts
+   │                    └ eval.ts
+   ├ .sst/platform/src/components/vercel/index.ts ───────────────────────────────────── 208b ──── 0.0%
+   │  └ .sst/platform/src/components/index.ts
+   │     └ sst.config.ts
+   │        └ eval.ts
+   ├ .sst/platform/src/components/experimental/index.ts ─────────────────────────────── 204b ──── 0.0%
+   │  └ .sst/platform/src/components/index.ts
+   │     └ sst.config.ts
+   │        └ eval.ts
+   ├ ../../packages/core/src/manifest/field-schema.ts ───────────────────────────────── 199b ──── 0.0%
+   │  └ ../../packages/core/src/manifest/index.ts
+   │     └ ../../packages/manifest/src/index.ts
+   │        └ ../../packages/sst/dist/index.js
+   │           └ sst.ts
+   │              └ sst.config.ts
+   │                 └ eval.ts
+   ├ ../../packages/manifest/src/index.ts ───────────────────────────────────────────── 199b ──── 0.0%
+   │  └ ../../packages/sst/dist/index.js
+   │     └ sst.ts
+   │        └ sst.config.ts
+   │           └ eval.ts
+   ├ ../../packages/core/src/manifest/json-schema.ts ────────────────────────────────── 198b ──── 0.0%
+   │  └ ../../packages/core/src/manifest/index.ts
+   │     └ ../../packages/manifest/src/index.ts
+   │        └ ../../packages/sst/dist/index.js
+   │           └ sst.ts
+   │              └ sst.config.ts
+   │                 └ eval.ts
+   ├ .sst/platform/src/components/cloudflare/experimental/static-site.ts ────────────── 196b ──── 0.0%
+   │  └ .sst/platform/src/components/cloudflare/experimental/index.ts
+   │     └ .sst/platform/src/components/cloudflare/index.ts
+   │        └ .sst/platform/src/components/index.ts
+   │           └ sst.config.ts
+   │              └ eval.ts
+   ├ .sst/platform/src/config.ts ────────────────────────────────────────────────────── 194b ──── 0.0%
+   └ eval.ts ────────────────────────────────────────────────────────────────────────── 125b ──── 0.0%

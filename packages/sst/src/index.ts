@@ -54,13 +54,17 @@ function resolveManifest(manifestProp: Manifest | string): Manifest {
  * subpath at Pulumi-program time so the path survives moves.
  */
 function resolveHandlerPath(handlerExport: string): string {
-  // require.resolve finds the CJS entry for the subpath in node_modules.
+  // require.resolve finds the entry for the subpath in node_modules.
   // The resolved path is absolute; SST's esbuild bundler traces from there.
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const resolved: string = require.resolve(
     `@draht/runtime-aws/handlers`
   );
-  return `${resolved}.${handlerExport}`;
+  // SST's Function `handler` is "<file>.<export>" where <file> has NO bundler
+  // extension (SST resolves .js/.cjs/.mjs itself). Leaving ".cjs" in the middle
+  // makes SST mis-split "index.cjs.executorHandler" → "Handler not found".
+  const noExt = resolved.replace(/\.(c|m)?js$/, "");
+  return `${noExt}.${handlerExport}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -154,6 +158,23 @@ export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
     });
     table = dynamoResource;
     tableName = dynamoResource.name;
+
+    // Snapshot the FULL manifest blob into the table at deploy (§4 / A.3 must-fix):
+    // pk=MANIFEST#<id>, sk=REV#<rev>, NEVER overwritten. The executor's loadManifest
+    // reads exactly this row to run/resume against the pinned revision. The item shape
+    // matches DynamoStorage.putManifest() ({ pk, sk, _entity:"Manifest", blob }).
+    new aws.dynamodb.TableItem(`${name}ManifestSeed`, {
+      tableName: dynamoResource.name,
+      hashKey: "pk",
+      rangeKey: "sk",
+      item: JSON.stringify({
+        pk: { S: `MANIFEST#${plan.manifestId}` },
+        sk: { S: `REV#${plan.manifestRevision}` },
+        _entity: { S: "Manifest" },
+        blob: { S: plan.manifestBlob },
+      }),
+      ...(props.provider !== undefined ? { providers: { aws: props.provider } } : {}),
+    });
   } else {
     // Shared mode: use the host table directly.
     const sharedStorage = props.storage as { mode: "shared"; table: unknown; keyPrefix?: string };
@@ -168,7 +189,7 @@ export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
   } catch {
     // Fallback for environments where require.resolve is unavailable (e.g. ESM pure mode).
     // The consumer must ensure @draht/runtime-aws is in node_modules.
-    executorHandlerPath = "node_modules/@draht/runtime-aws/dist/handlers/executor.executorHandler";
+    executorHandlerPath = "node_modules/@draht/runtime-aws/dist/handlers/index.executorHandler";
   }
 
   // Build the link array for the executor function.
@@ -233,7 +254,7 @@ export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
     try {
       triggerHandlerPath = resolveHandlerPath("triggerHandler");
     } catch {
-      triggerHandlerPath = "node_modules/@draht/runtime-aws/dist/handlers/trigger.triggerHandler";
+      triggerHandlerPath = "node_modules/@draht/runtime-aws/dist/handlers/index.triggerHandler";
     }
 
     new sst.aws.Cron(`${name}Cron${cron.triggerId}`, {
@@ -262,7 +283,7 @@ export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
     try {
       ingressHandlerPath = resolveHandlerPath("ingressHandler");
     } catch {
-      ingressHandlerPath = "node_modules/@draht/runtime-aws/dist/handlers/ingress.ingressHandler";
+      ingressHandlerPath = "node_modules/@draht/runtime-aws/dist/handlers/index.ingressHandler";
     }
 
     const channelEnv: Record<string, unknown> = {
@@ -328,7 +349,7 @@ export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
   try {
     resumeHandlerPath = resolveHandlerPath("resumeHandler");
   } catch {
-    resumeHandlerPath = "node_modules/@draht/runtime-aws/dist/handlers/resume.resumeHandler";
+    resumeHandlerPath = "node_modules/@draht/runtime-aws/dist/handlers/index.resumeHandler";
   }
 
   new sst.aws.Function(`${name}Resume`, {

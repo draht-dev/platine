@@ -196,24 +196,29 @@ export function planResources(
     }));
 
   // ── HTTP routes ───────────────────────────────────────────────────────────
-  // One route per http channel in the manifest.
-  // Cross-reference with props.channels to detect whether a router was provided.
-  const httpRoutes: HttpRoute[] = manifest.channels
-    .filter((ch) => ch.kind === "http")
-    .map((ch) => {
-      // Check if props.channels carries a router for this channel.
-      const channelCfg = props.channels?.find(
-        (c) => c.kind === "http"
-      );
+  // Prefer http channels declared in the manifest (authoring-time). When the
+  // manifest declares none, derive routes from deploy-time props.channels — the
+  // SST-layer channel config (per §3.4 DrahtAgentProps.channels). This lets an
+  // agent whose workflow uses a non-http trigger still expose an HTTP ingress
+  // purely from the sst.config.ts.
+  const manifestHttp = manifest.channels.filter((ch) => ch.kind === "http");
+  let httpRoutes: HttpRoute[];
+  if (manifestHttp.length > 0) {
+    httpRoutes = manifestHttp.map((ch) => {
+      const channelCfg = props.channels?.find((c) => c.kind === "http");
       const useRouter =
         channelCfg !== undefined && "router" in channelCfg && channelCfg.router !== undefined;
-      return {
-        channelId: ch.channelId,
-        path: ch.path ?? "/",
-        auth: ch.auth,
-        useRouter,
-      };
+      return { channelId: ch.channelId, path: ch.path ?? "/", auth: ch.auth, useRouter };
     });
+  } else {
+    httpRoutes = (props.channels ?? [])
+      .filter((c) => c.kind === "http")
+      .map((cfg, i) => {
+        const path = "path" in cfg && cfg.path !== undefined ? cfg.path : "/";
+        const useRouter = "router" in cfg && cfg.router !== undefined;
+        return { channelId: i === 0 ? "http" : `http${i}`, path, auth: undefined, useRouter };
+      });
+  }
 
   // ── IAM permissions ───────────────────────────────────────────────────────
   // Bedrock permission: required when manifest says needsBedrock OR model provider is bedrock.

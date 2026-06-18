@@ -84,9 +84,19 @@ class SqsQueue implements Queue {
 import type { ToolsDispatcher, ApprovalsCoordinator } from "../executor.js";
 import type { ApprovalRow } from "@draht/core/seams";
 
-class NoopToolsDispatcher implements ToolsDispatcher {
+/**
+ * v1 STUB dispatcher. The deployed executor runs the full DAG-scheduling +
+ * checkpoint/resume + approval-gate machinery, but does NOT yet execute the
+ * user's authored tool `execute()` code — that requires bundling the agent's
+ * compiled tools/*.ts into the Lambda + a per-agent tool registry (tracked as a
+ * v1.x item). Until then a tool node returns an empty stub result (and warns) so
+ * the durability/approval machinery is exercisable end-to-end on real AWS.
+ * Tool BUSINESS LOGIC is not run; tool RESULTS are stubbed.
+ */
+class StubToolsDispatcher implements ToolsDispatcher {
   async execute(toolRef: string, _input: Record<string, unknown>, _ctx: { idempotencyKey: string; tenantId: TenantId }): Promise<unknown> {
-    throw new Error(`[executor] tool dispatch not supported in Lambda handler: ${toolRef}`);
+    console.warn(`[executor] STUB tool dispatch (v1: user tool code not bundled): ${toolRef} → {}`);
+    return {};
   }
   hasSideEffect(_toolRef: string): boolean { return true; }
 }
@@ -172,7 +182,7 @@ export async function executorHandler(
   const bus       = new EventBridgeBus(busName, new EventBridgeClient({}));
   const queue     = new SqsQueue(new SQSClient({}), queueUrl);
   const tenancy   = new NoopTenancy();
-  const tools     = new NoopToolsDispatcher();
+  const tools     = new StubToolsDispatcher();
   const approvals = new StorageApprovalsCoordinator(storage);
   const model     = new NoopModel();
 
