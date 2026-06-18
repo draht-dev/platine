@@ -18,6 +18,7 @@
  * SQS visibility timeout MUST exceed the Lambda function timeout.
  */
 
+import { randomUUID } from "node:crypto";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { EventBridgeClient } from "@aws-sdk/client-eventbridge";
@@ -102,7 +103,6 @@ class StubToolsDispatcher implements ToolsDispatcher {
 }
 
 class StorageApprovalsCoordinator implements ApprovalsCoordinator {
-  private counter = 0;
   constructor(private readonly storage: DynamoStorage) {}
 
   async hold(params: {
@@ -113,8 +113,12 @@ class StorageApprovalsCoordinator implements ApprovalsCoordinator {
     paramsJson: string;
     idempotencyKey: string;
   }): Promise<string> {
-    this.counter++;
-    const actionId = `action_${params.runId}_${params.nodeId}_${this.counter}`;
+    // SECURITY FIX (CRITICAL 2): generate an unguessable actionId using
+    // crypto.randomUUID() so that approval actionIds cannot be forged by an
+    // attacker who knows the runId and nodeId (both of which are predictable).
+    // The old scheme `action_${runId}_${nodeId}_${counter}` was fully computable
+    // from public information and allowed unauthorized approval resolution.
+    const actionId = `action_${randomUUID()}`;
     const row: ApprovalRow = {
       runId: params.runId,
       stepId: params.nodeId,

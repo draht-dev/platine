@@ -16,6 +16,7 @@
  */
 
 import { createHash } from "node:crypto";
+import { ssrfSafeFetch } from "./ssrf.js";
 import type { Manifest } from "@draht/core/manifest";
 import { parseManifest } from "@draht/core/manifest";
 import type {
@@ -532,7 +533,10 @@ async function runStep(
         if (body !== undefined) {
           fetchInit.body = body;
         }
-        const resp = await fetch(t.url, fetchInit);
+        // SECURITY FIX (HIGH 3): use ssrfSafeFetch instead of raw fetch.
+        // Raw fetch allows requests to 169.254.169.254 (IMDS), RFC1918 addresses,
+        // and follows redirects, enabling SSRF attacks that could steal AWS credentials.
+        const resp = await ssrfSafeFetch(t.url, fetchInit);
         out = await resp.json() as unknown;
       } catch (err) {
         return {

@@ -199,22 +199,37 @@ export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
     ...(props.link ?? []),
   ];
 
+  // Resolve the DynamoDB table ARN for scoped IAM permissions.
+  // In managed mode the ARN comes from the dynamoResource; in shared mode it
+  // comes from the consumer-supplied table object (which must expose an `arn` prop).
+  const tableArn: unknown = plan.storageMode === "managed"
+    ? (table as { arn: unknown }).arn
+    : (
+        (props.storage as { mode: "shared"; table: unknown } | undefined)?.table as
+          | { arn: unknown }
+          | undefined
+      )?.arn ?? (table as { arn: unknown }).arn;
+
+  const busArn: unknown = (bus as { arn?: unknown }).arn ?? "*";
+
   // Build permissions for the executor function.
-  const executorPermissions: Array<{ actions: string[]; resources: string[] }> = [
-    // SQS permissions (send to own queue for continuations + delete from main).
-    { actions: ["sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"], resources: ["*"] },
-    // EventBridge permissions (publish events).
-    { actions: ["events:PutEvents"], resources: ["*"] },
-    // DynamoDB permissions (read/write to own or shared table).
+  // SECURITY FIX (HIGH 4): scope IAM permissions to specific ARNs instead of "*".
+  // Bedrock InvokeModel remains "*" (model ARNs vary and are not knowable at deploy time).
+  const executorPermissions: Array<{ actions: string[]; resources: unknown[] }> = [
+    // SQS permissions — scoped to the agent's own queue and DLQ.
+    { actions: ["sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"], resources: [queue.arn, dlq.arn] },
+    // EventBridge permissions — scoped to the agent's own bus.
+    { actions: ["events:PutEvents"], resources: [busArn] },
+    // DynamoDB permissions — scoped to the table and its GSI index paths.
     { actions: [
       "dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:UpdateItem",
       "dynamodb:DeleteItem", "dynamodb:Query", "dynamodb:TransactWrite",
-    ], resources: ["*"] },
-    // Bedrock permissions (when applicable).
+    ], resources: [tableArn, $util.interpolate`${tableArn as string}/index/*`] },
+    // Bedrock permissions (when applicable) — remains "*" (model ARNs are not static).
     ...(plan.bedrockPermission !== null ? [plan.bedrockPermission as { actions: string[]; resources: string[] }] : []),
     // Extra permissions from manifest + props.
     ...(plan.extraPermissions as Array<{ actions: string[]; resources: string[] }>),
-  ];
+  ] as Array<{ actions: string[]; resources: string[] }>;
 
   // Environment for the executor.
   const executorEnv: Record<string, unknown> = {
@@ -354,7 +369,11 @@ export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
 
   new sst.aws.Function(`${name}Resume`, {
     handler: resumeHandlerPath,
-    url: true,
+    // SECURITY FIX (CRITICAL 1): require IAM auth on the resume endpoint.
+    // A fully-public Function URL (url: true) allows anyone to POST and resolve
+    // an approval gate. The `platine runs approve` CLI uses AWS credentials and
+    // signs requests with SigV4, so requiring IAM auth is the correct policy.
+    url: { authorization: "aws_iam" },
     environment: {
       ...baseEnv,
       DRAHT_QUEUE_URL: queue.url,
@@ -368,6 +387,8 @@ export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
 
   // 11. sst.Linkable — exposes the agent's outputs to other SST components.
   //     include: sst.aws.permission grants for consumers that link this agent.
+  //     SECURITY FIX (HIGH 4): scope DynamoDB and EventBridge permissions to
+  //     specific ARNs instead of "*".
   const linkable = new sst.Linkable(name, {
     properties: {
       queueUrl: queue.url,
@@ -383,14 +404,14 @@ export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
       }),
       sst.aws.permission({
         actions: ["events:PutEvents"],
-        resources: ["*"],
+        resources: [busArn as string],
       }),
       sst.aws.permission({
         actions: [
           "dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:UpdateItem",
           "dynamodb:DeleteItem", "dynamodb:Query", "dynamodb:TransactWrite",
         ],
-        resources: ["*"],
+        resources: [tableArn as string, $util.interpolate`${tableArn as string}/index/*`],
       }),
     ],
   });

@@ -14,6 +14,7 @@
  *   SAME executor.ts behind the seams.
  */
 
+import { randomUUID } from "node:crypto";
 import type {
   TenantId,
   RunId,
@@ -465,8 +466,6 @@ export class FakeToolsDispatcher implements ToolsDispatcher {
 // ---------------------------------------------------------------------------
 
 export class FakeApprovalsCoordinator implements ApprovalsCoordinator {
-  private actionCounter = 0;
-
   constructor(private readonly storage: MemoryStorage) {}
 
   async hold(params: {
@@ -477,8 +476,9 @@ export class FakeApprovalsCoordinator implements ApprovalsCoordinator {
     paramsJson: string;
     idempotencyKey: string;
   }): Promise<string> {
-    this.actionCounter++;
-    const actionId = `action_${this.actionCounter}`;
+    // SECURITY FIX (CRITICAL 2): use crypto.randomUUID() to match the production
+    // StorageApprovalsCoordinator's unguessable actionId scheme.
+    const actionId = `action_${randomUUID()}`;
     const row: ApprovalRow = {
       runId: params.runId,
       stepId: params.nodeId,

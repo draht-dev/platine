@@ -216,7 +216,18 @@ export function planResources(
       .map((cfg, i) => {
         const path = "path" in cfg && cfg.path !== undefined ? cfg.path : "/";
         const useRouter = "router" in cfg && cfg.router !== undefined;
-        return { channelId: i === 0 ? "http" : `http${i}`, path, auth: undefined, useRouter };
+        // SECURITY FIX (HIGH 5): derive auth from the props http channel config.
+        // Previously this branch always set auth: undefined, silently making ingress
+        // public even when the deployer intended to configure auth.
+        const auth = "auth" in cfg && cfg.auth !== undefined ? cfg.auth : undefined;
+        if (auth === undefined) {
+          // Warn at provision time that this ingress is PUBLIC.
+          console.warn(
+            `[draht/sst] WARNING: ingress channel '${i === 0 ? "http" : `http${i}`}' ` +
+            `(path=${path}) has no auth configured — this Function URL is PUBLIC.`,
+          );
+        }
+        return { channelId: i === 0 ? "http" : `http${i}`, path, auth, useRouter };
       });
   }
 

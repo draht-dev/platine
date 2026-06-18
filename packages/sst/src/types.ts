@@ -72,6 +72,12 @@ export interface DrahtAgentProps {
     /** Path override (defaults to the manifest channel path). */
     path?: string;
     cors?: boolean;
+    /**
+     * Auth scheme for this ingress channel (e.g. "bearer", "aws_iam").
+     * SECURITY FIX (HIGH 5): when absent the ingress endpoint is PUBLIC.
+     * The factory will emit a console.warn so the deployer is aware.
+     */
+    auth?: string;
   }>;
 
   /** Tenancy mode.  "multi" is a seam only — single-tenant default in v1. */
