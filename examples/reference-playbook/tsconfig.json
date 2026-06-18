@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "@draht/core/define-tool": ["../../packages/core/src/define-tool.ts"],
+      "@draht/core/define-agent": ["../../packages/core/src/define-agent.ts"],
+      "@draht/core/define-workflow": ["../../packages/core/src/define-workflow.ts"],
+      "@draht/core/manifest": ["../../packages/core/src/manifest/index.ts"],
+      "@draht/core/seams": ["../../packages/core/src/seams/index.ts"],
+      "@draht/core/compile": ["../../packages/core/src/compile.ts"],
+      "@draht/manifest": ["../../packages/manifest/src/index.ts"]
+    }
+  },
+  "include": [
+    "workflow.ts",
+    "tools/**/*.ts"
+  ],
+  "exclude": [
+    ".platine",
+    "node_modules"
+  ]
+}

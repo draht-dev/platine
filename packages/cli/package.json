@@ -23,12 +23,21 @@
     "@draht/core": "workspace:*",
     "@draht/manifest": "workspace:*",
     "@draht/model": "workspace:*",
-    "@draht/runtime-aws": "workspace:*"
+    "@draht/runtime-aws": "workspace:*",
+    "tsx": "^4.22.4"
+  },
+  "optionalDependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.1071.0",
+    "@aws-sdk/client-dynamodb": "^3.1071.0",
+    "@aws-sdk/lib-dynamodb": "^3.1071.0",
+    "@aws-sdk/client-sqs": "^3.1071.0",
+    "@anthropic-ai/sdk": "^0.54.0"
   },
   "devDependencies": {
     "@types/node": "^20.19.0",
     "tsup": "^8.5.0",
     "typescript": "~5.9.0",
-    "vitest": "^3.2.3"
+    "vitest": "^3.2.3",
+    "zod": "^3.25.76"
   }
 }

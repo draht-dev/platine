@@ -1,15 +1,26 @@
 {
   "name": "@draht/example-reference-playbook",
   "version": "0.0.1",
-  "description": "draht reference playbook — the one shipped installable typed playbook. Full authoring→compile→deploy→run. (P9 implements.)",
+  "description": "draht reference playbook — support-triage single-agent workflow with one approval-gated tool. Full authoring→compile→deploy→run.",
   "license": "Apache-2.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "echo 'reference-playbook: stub — P9 implements'",
-    "typecheck": "tsc --noEmit"
+    "build": "tsx ../../packages/cli/dist/index.cjs build --skip-typecheck",
+    "build:check": "tsx ../../packages/cli/dist/index.cjs build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@draht/core": "workspace:*",
+    "@draht/sst": "workspace:*",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "typescript": "~5.9.0"
+    "@draht/platine": "workspace:*",
+    "@types/node": "^20.19.0",
+    "tsx": "^4.19.4",
+    "typescript": "~5.9.0",
+    "vitest": "^3.2.3"
   }
 }
