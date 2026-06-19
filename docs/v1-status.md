@@ -16,8 +16,15 @@ handoff: what exists, what's proven, and what's deferred.
 | `@draht/sst` | The deploy surface: `draht.Agent`/`draht.Workflow` **factory** + pure `planResources()`. |
 | `@draht/platine` | CLI (bin `platine`): `init / build / dev / deploy / runs`. |
 
-Gate: **`pnpm verify`** = build (incl. `.d.ts`) + `tsc --noEmit` + all tests + the
-mis-wire fixture gate. ~257 unit tests + 8 fixture-gate cases, all green.
+Gate: **`pnpm verify`** = build (incl. `.d.ts`) + `tsgo --noEmit` (TypeScript 7) +
+all tests + the mis-wire fixture gate. ~257 unit tests + 8 fixture-gate cases, all green.
+Typecheck is **build-free**: cross-package `@draht/*` imports resolve to SOURCE via
+centralized `paths` in `tsconfig.base.json`, so `tsgo` needs no prior build. (Packages
+drop `composite`/`references`/`rootDir`/`outDir` — under tsgo those route resolution
+through composite-project machinery that collapses deep Zod `z.infer` types to `any`;
+tsup clears the paths in its dts worker so declaration emit still resolves via dist.)
+The mis-wire fixture gate runs on the `typescript` 5.9 Compiler API, which is also what
+tsup uses to emit `.d.ts`.
 
 ## Acceptance truths
 

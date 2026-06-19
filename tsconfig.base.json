@@ -6,17 +6,40 @@
     "moduleResolution": "NodeNext",
     "target": "ES2022",
     "lib": ["ES2022"],
-    "declaration": true,
-    "declarationMap": true,
+    // tsc/tsgo is used ONLY for typechecking in this repo — tsup owns all emit and
+    // generates declarations via its own program. Requesting declaration output here
+    // would force rootDir-containment checks (TS6059) under --noEmit once we pull
+    // sibling SOURCE via the paths below, so declarations are off for typecheck.
+    "declaration": false,
+    "declarationMap": false,
     "sourceMap": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
-    "esModuleInterop": false,
-    "allowSyntheticDefaultImports": false,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true
+    "exactOptionalPropertyTypes": true,
+
+    // Build-free cross-package typecheck: @draht/* resolve to SOURCE (relative to
+    // this base file = repo root) so tsgo needs no prior build. Every package + the
+    // example inherits these, which covers transitive source pulls. tsgo collapses
+    // these Zod-inferred types to `any` ONLY through composite-project/references
+    // machinery — so packages drop composite/rootDir/references. tsup clears paths
+    // in its dts worker so declaration emit resolves via dist.
+    "paths": {
+      "@draht/core/define-tool": ["./packages/core/src/define-tool.ts"],
+      "@draht/core/define-agent": ["./packages/core/src/define-agent.ts"],
+      "@draht/core/define-workflow": ["./packages/core/src/define-workflow.ts"],
+      "@draht/core/manifest": ["./packages/core/src/manifest/index.ts"],
+      "@draht/core/seams": ["./packages/core/src/seams/index.ts"],
+      "@draht/core/compile": ["./packages/core/src/compile.ts"],
+      "@draht/manifest": ["./packages/manifest/src/index.ts"],
+      "@draht/model": ["./packages/model/src/index.ts"],
+      "@draht/runtime-aws": ["./packages/runtime-aws/src/index.ts"],
+      "@draht/runtime-aws/handlers": ["./packages/runtime-aws/src/handlers/index.ts"],
+      "@draht/sst": ["./packages/sst/src/index.ts"],
+      "@draht/platine": ["./packages/cli/src/index.ts"]
+    }
   }
 }

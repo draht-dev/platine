@@ -6,7 +6,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsgo --noEmit",
     "test": "vitest run --reporter=verbose"
   },
   "devDependencies": {

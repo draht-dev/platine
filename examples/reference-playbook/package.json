@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsx ../../packages/cli/dist/index.cjs build --skip-typecheck",
     "build:check": "tsx ../../packages/cli/dist/index.cjs build",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsgo --noEmit",
     "test": "vitest run"
   },
   "dependencies": {

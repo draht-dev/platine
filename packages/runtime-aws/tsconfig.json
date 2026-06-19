@@ -1,20 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "dist",
-    "composite": true,
-    "paths": {
-      "@draht/core/*": ["../core/src/*"],
-      "@draht/manifest": ["../manifest/src/index.ts"]
-    }
-  },
   "include": ["src/**/*"],
-  "exclude": ["dist", "node_modules"],
-  "references": [
-    { "path": "../core" },
-    { "path": "../manifest" },
-    { "path": "../model" }
-  ]
+  "exclude": ["dist", "node_modules"]
 }

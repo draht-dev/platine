@@ -16,7 +16,7 @@
   },
   "scripts": {
     "build": "tsup",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsgo --noEmit",
     "test": "vitest run"
   },
   "dependencies": {

@@ -32,8 +32,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Typecheck is build-free: tsgo (TypeScript 7) resolves @draht/* to source via
+      # the centralized paths in tsconfig.base.json, so it needs no prior build.
       - name: Typecheck
-        run: pnpm -r exec tsc --noEmit
+        run: pnpm -r exec tsgo --noEmit
 
       - name: Test
         run: pnpm test

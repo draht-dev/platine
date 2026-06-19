@@ -3,6 +3,10 @@
   "//": "Harness-only config: includes the intentionally-mis-wired cases/ (which DO error by design) plus the valid/ baseline. Loaded programmatically by miswire.test.ts via the TS compiler API. NOT used by plain `tsc --noEmit` — that uses tsconfig.json, which excludes cases so the workspace typecheck stays clean.",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    // paths:{} opts out of the base @draht/* → source aliases (this config is loaded
+    // by miswire.test.ts via the typescript Compiler API): resolve @draht/core via
+    // dist .d.ts so the asserted mis-wire diagnostic codes/lines stay stable.
+    "paths": {},
     "rootDir": ".",
     "noEmit": true,
     "composite": false,

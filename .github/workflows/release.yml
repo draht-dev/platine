@@ -47,7 +47,7 @@ jobs:
         run: pnpm build
 
       - name: Typecheck
-        run: pnpm -r exec tsc --noEmit
+        run: pnpm -r exec tsgo --noEmit
 
       - name: Test
         run: pnpm test

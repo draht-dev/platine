@@ -11,10 +11,9 @@ export default defineConfig({
   },
   format: ["esm", "cjs"],
   dts: {
-    // composite:true in tsconfig is for `tsc -b` project references; override to
-    // false here so tsup's rollup DTS worker does not emit TS6307.
-    // The tsconfig keeps composite:true for tsc --noEmit.
-    compilerOptions: { composite: false },
+    // paths:{} clears the base @draht/* → source aliases so the DTS worker
+    // resolves sibling packages via dist .d.ts. composite:false avoids TS6307.
+    compilerOptions: { composite: false, paths: {} },
   },
   clean: true,
   treeshake: true,
