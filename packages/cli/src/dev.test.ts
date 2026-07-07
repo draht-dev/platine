@@ -268,6 +268,67 @@ describe("dev — createDevSession", () => {
     void originalRevision; // used for reference
   });
 
+  it("SHOULD-FIX 6: reload() racing an in-flight run() does not lose the run — session.run() snapshots its runtime/storage/manifest generation", async () => {
+    const tmp = await mkdtemp(join(tmpdir(), "platine-dev-test-"));
+    created.push(tmp);
+
+    await writeDevWorkflow(tmp);
+
+    const tools = new FakeToolsDispatcher();
+    // Artificial delay so the run's drainQueue() is still in-flight when we
+    // fire reload() — widening the window between submitRun() and
+    // drainQueue()'s completion where the bug (outer `runtime`/`storage`
+    // rebound mid-flight) would otherwise bite.
+    tools.register("tool_tool_1", async (input) => {
+      await new Promise((r) => setTimeout(r, 30));
+      return { greeting: `Hello, ${String(input["name"])}!` };
+    });
+
+    const model = new ScriptedModel([{ stopReason: "end_turn", text: "done" }]);
+    const session = await createDevSession({ dir: tmp, model, tools });
+
+    // Start run() but do NOT await yet — it's mid-flight (past submitRun(),
+    // inside the delayed drainQueue()) when we call reload() below.
+    const runPromise = session.run({ input: { name: "World" } });
+
+    // Give submitRun() (fast, in-memory) time to complete, landing us inside
+    // the artificial tool delay — i.e. mid-drainQueue().
+    await new Promise((r) => setTimeout(r, 5));
+
+    // Rewrite workflow.ts with a new revision and reload DURING the in-flight run.
+    const reloadedManifest = {
+      ...session.manifest,
+      revision: "rev_after_reload_race",
+    };
+    await writeFile(
+      join(tmp, "workflow.ts"),
+      `export default {
+  nodes: [],
+  edges: [],
+  outputNodeId: "tool_1",
+  compile() {
+    return ${JSON.stringify(reloadedManifest, null, 2)};
+  },
+};`,
+      "utf8",
+    );
+    await session.reload();
+
+    // The in-flight run() must still resolve successfully — NOT throw
+    // "Run not found after drain" — because it snapshotted the PRE-reload
+    // runtime/storage/manifest generation at the top of run().
+    const { run } = await runPromise;
+    expect(run.status).toBe("completed");
+    expect(run.manifestRevision).toBe("rev_dev_test"); // the PRE-reload revision
+
+    // The session itself now reflects the reloaded manifest for FUTURE runs.
+    expect(session.manifest.revision).toBe("rev_after_reload_race");
+    tools.register("tool_tool_1", async () => ({ greeting: "hi" }));
+    const { run: postReloadRun } = await session.run({ input: { name: "Post" } });
+    expect(postReloadRun.status).toBe("completed");
+    expect(postReloadRun.manifestRevision).toBe("rev_after_reload_race");
+  });
+
   it("approval-held run leaves status as awaiting_approval", async () => {
     const tmp = await mkdtemp(join(tmpdir(), "platine-dev-test-"));
     created.push(tmp);
@@ -308,5 +369,33 @@ describe("dev — manifest from createDevSession", () => {
     expect(session.manifest.kind).toBe("workflow");
     expect(session.manifest.agent.agentId).toBe("dev-test-agent");
     expect(session.manifest.schemaVersion).toBe("1.0.0");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// dev — DEFAULT tools dispatch runs the REAL workflow tool code (no
+// `opts.tools` injected). Uses the real-agent fixture (real defineWorkflow +
+// a real defineTool imported via a NodeNext './tools/greet.js' specifier).
+// ---------------------------------------------------------------------------
+
+describe("dev — default RealToolsDispatcher runs the user's actual tool code", () => {
+  const fixtureDir = join(import.meta.dirname, "__fixtures__", "real-agent");
+
+  it("produces the greet tool's REAL computed output, not a stub", async () => {
+    // No `tools` option — createDevSession must default to a RealToolsDispatcher
+    // built from the fixture workflow's own tool registry.
+    const model = new ScriptedModel([]);
+    const session = await createDevSession({ dir: fixtureDir, model });
+
+    const { run } = await session.run({ input: { name: "Ada" } });
+
+    expect(run.status).toBe("completed");
+
+    const toolStep = run.steps.find(
+      (s) => s.status === "completed" && s.output !== undefined && s.stepId !== "__trigger__",
+    );
+    expect(toolStep).toBeDefined();
+    // The REAL greet tool's execute() output ("Hello, Ada!") — NOT {} (a stub).
+    expect(toolStep?.output).toEqual({ greeting: "Hello, Ada!" });
   });
 });

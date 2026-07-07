@@ -10,7 +10,14 @@
  *   - The model string "anthropic/..." vs "bedrock/..." picks the adapter.
  *   - For tests, inject a fake Model via `devOptions.model`.
  *   - Hot-reload: watches workflow.ts + tools/** and re-compiles on change.
- *     In-flight runs are not interrupted (MemoryStorage snapshots pinned manifests).
+ *     reload() REPLACES the runtime/storage with a fresh MemoryStorage/LocalRuntime
+ *     pair (not a mutation) — it does NOT preserve in-flight run state. Each
+ *     `run()` call snapshots the runtime/storage/manifest it started with into
+ *     local consts (see run()'s comment) so a reload() racing with an
+ *     in-flight run() completes safely against the generation it started
+ *     with, rather than crossing into the NEW runtime/storage mid-flight —
+ *     but that run's data then lives only in the now-orphaned pre-reload
+ *     MemoryStorage, inaccessible to the session after reload() returns.
  *
  * The `run` export submits one run; `watch` re-compiles on FS change (v1 hot-reload).
  */
@@ -20,8 +27,10 @@ import { pathToFileURL } from "node:url";
 import { watch as fsWatch } from "node:fs";
 import type { Model, RunId, RunRecord } from "@draht/core/seams";
 import { DEFAULT_TENANT } from "@draht/core/seams";
-import { deriveRunId, createLocalRuntime, FakeToolsDispatcher } from "@draht/runtime-aws";
-import type { LocalRuntimeOptions } from "@draht/runtime-aws";
+import { deriveRunId, createLocalRuntime, RealToolsDispatcher } from "@draht/runtime-aws";
+import type { LocalRuntimeOptions, ToolsDispatcher } from "@draht/runtime-aws";
+import { buildToolRegistry } from "@draht/core/compile";
+import type { WorkflowDef } from "@draht/core/define-workflow";
 import { parseManifest } from "@draht/manifest";
 import type { Manifest } from "@draht/manifest";
 
@@ -82,7 +91,14 @@ async function resolveModel(): Promise<Model> {
 // Workflow loading
 // ---------------------------------------------------------------------------
 
-async function loadWorkflow(dir: string): Promise<Manifest> {
+interface LoadedWorkflow {
+  /** The raw WorkflowDef — its `.nodes` carry the ToolDef `execute()` closures
+   * (never serialized into the Manifest), consumed by buildToolRegistry(). */
+  workflowDef: WorkflowDef;
+  manifest: Manifest;
+}
+
+async function loadWorkflow(dir: string): Promise<LoadedWorkflow> {
   const workflowPath = join(dir, "workflow.ts");
   // tsx's tsImport transpiles .ts on the fly and resolves NodeNext .js→.ts
   // specifiers inside the agent dir.  We add a cache-busting suffix so that
@@ -123,15 +139,17 @@ async function loadWorkflow(dir: string): Promise<Manifest> {
     defaultExport = (defaultExport as { default: unknown }).default;
   }
 
-  const workflowDef = defaultExport as { compile?: () => Manifest };
-  if (typeof workflowDef.compile !== "function") {
+  const workflowDefLoose = defaultExport as { compile?: () => Manifest };
+  if (typeof workflowDefLoose.compile !== "function") {
     throw new Error(
       `[platine dev] The default export of workflow.ts must be a WorkflowDef with .compile().`
     );
   }
 
-  const raw = workflowDef.compile();
-  return parseManifest(JSON.parse(JSON.stringify(raw)));
+  const raw = workflowDefLoose.compile();
+  const manifest = parseManifest(JSON.parse(JSON.stringify(raw)));
+
+  return { workflowDef: workflowDefLoose as unknown as WorkflowDef, manifest };
 }
 
 // ---------------------------------------------------------------------------
@@ -147,10 +165,12 @@ export interface DevOptions {
    */
   model?: Model;
   /**
-   * Inject a FakeToolsDispatcher for tests.
-   * When provided, tools are dispatched through the fake instead of the real workflow tools.
+   * Inject a ToolsDispatcher (e.g. FakeToolsDispatcher) for tests.
+   * When omitted, tools dispatch through a RealToolsDispatcher built from the
+   * workflow's own tool registry (buildToolRegistry) — the SAME user-authored
+   * `execute()` code that runs in the deployed executor Lambda.
    */
-  tools?: FakeToolsDispatcher;
+  tools?: ToolsDispatcher;
 }
 
 export interface DevRunInput {
@@ -191,12 +211,16 @@ export async function createDevSession(opts: DevOptions = {}): Promise<DevSessio
 
   // Resolve model (fake for tests, real for CLI use)
   const model = opts.model ?? (await resolveModel());
-  const tools = opts.tools ?? new FakeToolsDispatcher();
 
-  const runtimeOpts: LocalRuntimeOptions = { model, tools };
+  // Load workflow + manifest
+  let { workflowDef, manifest } = await loadWorkflow(dir);
 
-  // Load manifest
-  let manifest = await loadWorkflow(dir);
+  // Tools: injected (tests) or a RealToolsDispatcher built from the workflow's
+  // own tool registry — runs the user's ACTUAL tool execute() code in-process,
+  // the same registry-construction scheme the deployed executor Lambda uses.
+  let tools: ToolsDispatcher = opts.tools ?? new RealToolsDispatcher(buildToolRegistry(workflowDef));
+
+  const runtimeOpts: LocalRuntimeOptions<ToolsDispatcher> = { model, tools };
 
   // Create local runtime
   let { runtime, storage } = createLocalRuntime(runtimeOpts);
@@ -207,24 +231,37 @@ export async function createDevSession(opts: DevOptions = {}): Promise<DevSessio
     },
 
     async run(input: DevRunInput): Promise<DevRunResult> {
+      // SHOULD-FIX 6: snapshot the outer `runtime`/`storage`/`manifest` `let`
+      // bindings into LOCAL consts BEFORE any `await`. `run()` is async and
+      // spans multiple await points (submitRun, drainQueue); reload() can run
+      // to completion in between (e.g. the fs-watch debounce firing while a
+      // run is mid-flight) and REPLACES (not mutates) `runtime`/`storage` with
+      // a fresh MemoryStorage/LocalRuntime pair. Without this snapshot, this
+      // run() call would submitRun() against the OLD runtime but then
+      // drainQueue()/getRun() against the NEW one — the run would never be
+      // found ("Run not found after drain") even though it genuinely ran.
+      const activeRuntime = runtime;
+      const activeStorage = storage;
+      const activeManifest = manifest;
+
       // Re-snapshot the manifest for this run (so hot-reload doesn't corrupt in-flight runs)
-      await storage.putManifest(
-        manifest.agent.agentId,
-        manifest.revision,
-        JSON.stringify(manifest)
+      await activeStorage.putManifest(
+        activeManifest.agent.agentId,
+        activeManifest.revision,
+        JSON.stringify(activeManifest)
       );
 
       // Derive deterministic runId at boundary
-      const triggerSource = `dev:${manifest.agent.agentId}`;
+      const triggerSource = `dev:${activeManifest.agent.agentId}`;
       const dedupKey = JSON.stringify(input.input) + Date.now().toString();
       const runId = deriveRunId(triggerSource, dedupKey) as RunId;
 
       const tenantId = (input.tenantId ?? DEFAULT_TENANT) as import("@draht/core/seams").TenantId;
 
-      await runtime.submitRun({
+      await activeRuntime.submitRun({
         runId,
-        manifestId: manifest.agent.agentId,
-        manifestRevision: manifest.revision,
+        manifestId: activeManifest.agent.agentId,
+        manifestRevision: activeManifest.revision,
         tenantId,
         trigger: {
           type: "manual",
@@ -235,9 +272,9 @@ export async function createDevSession(opts: DevOptions = {}): Promise<DevSessio
       });
 
       // Drain the queue in-process
-      await runtime.drainQueue({ deadlineAt: Date.now() + 10 * 60 * 1000 });
+      await activeRuntime.drainQueue({ deadlineAt: Date.now() + 10 * 60 * 1000 });
 
-      const run = await storage.getRun(tenantId, runId);
+      const run = await activeStorage.getRun(tenantId, runId);
       if (!run) {
         throw new Error(`[platine dev] Run ${runId} not found after drain.`);
       }
@@ -246,7 +283,16 @@ export async function createDevSession(opts: DevOptions = {}): Promise<DevSessio
     },
 
     async reload(): Promise<void> {
-      manifest = await loadWorkflow(dir);
+      const loaded = await loadWorkflow(dir);
+      workflowDef = loaded.workflowDef;
+      manifest = loaded.manifest;
+
+      // Rebuild the default RealToolsDispatcher's registry from the freshly
+      // reloaded workflow so hot-reload picks up tool code changes too.
+      // An explicitly injected `opts.tools` (tests) is preserved unchanged.
+      tools = opts.tools ?? new RealToolsDispatcher(buildToolRegistry(workflowDef));
+      runtimeOpts.tools = tools;
+
       // Create a fresh runtime for the new manifest
       const fresh = createLocalRuntime(runtimeOpts);
       runtime = fresh.runtime;

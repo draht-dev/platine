@@ -204,7 +204,8 @@ async function runBuild(args: string[]): Promise<void> {
       `✓ Manifest written: ${result.manifestPath}\n` +
         `  agentId: ${result.manifest.agent.agentId}\n` +
         `  revision: ${result.manifest.revision}\n` +
-        `  nodes: ${result.manifest.nodes.length}\n`
+        `  nodes: ${result.manifest.nodes.length}\n` +
+        `✓ Executor entry written: ${result.entryPath}\n`
     );
   } catch (err: unknown) {
     process.stderr.write(`${err instanceof Error ? err.message : String(err)}\n`);

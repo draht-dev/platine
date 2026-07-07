@@ -172,6 +172,35 @@ describe("build", () => {
     expect(result.manifest.schemaVersion).toBe("1.0.0");
   });
 
+  it("writes .platine/executor.entry.ts that imports ../workflow.js + exports handler", async () => {
+    const tmp = await mkdtemp(join(tmpdir(), "platine-build-test-"));
+    created.push(tmp);
+
+    await writeMinimalWorkflow(tmp);
+
+    const result = await build({ dir: tmp, skipTypecheck: true });
+
+    expect(result.entryPath).toMatch(/\.platine[/\\]executor\.entry\.ts$/);
+    expect(await exists(result.entryPath)).toBe(true);
+
+    const source = await readFile(result.entryPath, "utf8");
+    expect(source).toContain('import workflow from "../workflow.js"');
+    expect(source).toContain('import { makeExecutorHandler } from "@draht/runtime-aws"');
+    expect(source).toContain("export const handler = makeExecutorHandler({ workflow });");
+  });
+
+  it("write:false skips writing .platine/executor.entry.ts", async () => {
+    const tmp = await mkdtemp(join(tmpdir(), "platine-build-test-"));
+    created.push(tmp);
+
+    await writeMinimalWorkflow(tmp);
+
+    const result = await build({ dir: tmp, skipTypecheck: true, write: false });
+
+    expect(result.entryPath).toBe("");
+    expect(await exists(join(tmp, ".platine", "executor.entry.ts"))).toBe(false);
+  });
+
   it("throws if workflow.ts has no default export", async () => {
     const tmp = await mkdtemp(join(tmpdir(), "platine-build-test-"));
     created.push(tmp);
