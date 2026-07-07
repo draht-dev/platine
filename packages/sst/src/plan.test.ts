@@ -11,7 +11,7 @@
 
 import { describe, it, expect } from "vitest";
 import { parseManifest } from "@draht/manifest";
-import { planResources } from "./plan.js";
+import { planResources, stripRegionPrefix } from "./plan.js";
 import type { DrahtAgentProps } from "./types.js";
 
 // ---------------------------------------------------------------------------
@@ -195,6 +195,30 @@ describe("planResources — support-triage fixture", () => {
     expect(plan.bedrockPermission).not.toBeNull();
     expect(plan.bedrockPermission?.actions).toContain("bedrock:InvokeModel");
     expect(plan.bedrockPermission?.actions).toContain("bedrock:InvokeModelWithResponseStream");
+  });
+
+  it("bedrockPermission.resources contains the foundation-model ARN and does NOT contain '*'", () => {
+    expect(plan.bedrockPermission?.resources).toContain(
+      "arn:aws:bedrock:*::foundation-model/anthropic.claude-haiku-4-5"
+    );
+    expect(plan.bedrockPermission?.resources).not.toContain("*");
+  });
+
+  it("bedrockInferenceProfileIds contains the region-prefixed model id for a prefixed model", () => {
+    expect(plan.bedrockInferenceProfileIds).toContain("eu.anthropic.claude-haiku-4-5");
+  });
+
+  it("bedrockInferenceProfileIds is empty for an unprefixed model", () => {
+    const p = minimalProps({
+      model: { provider: "bedrock", defaultModel: "anthropic.claude-haiku-4-5" },
+    });
+    const pl = planResources(manifest, p);
+    expect(pl.bedrockInferenceProfileIds).toEqual([]);
+  });
+
+  it("exposes modelProvider and defaultModel on the plan", () => {
+    expect(plan.modelProvider).toBe("bedrock");
+    expect(plan.defaultModel).toBe("eu.anthropic.claude-haiku-4-5");
   });
 
   it("produces a bedrock IAM permission when manifest.resources.needsBedrock is true", () => {
@@ -420,6 +444,45 @@ describe("planResources — extra IAM permissions", () => {
       pm.actions.includes("bedrock:InvokeAgent")
     );
     expect(perm).toBeDefined();
+  });
+});
+
+describe("stripRegionPrefix", () => {
+  it("strips 'eu.' prefix", () => {
+    expect(stripRegionPrefix("eu.anthropic.claude-haiku-4-5")).toBe(
+      "anthropic.claude-haiku-4-5"
+    );
+  });
+
+  it("strips 'us.' prefix", () => {
+    expect(stripRegionPrefix("us.anthropic.claude-haiku-4-5")).toBe(
+      "anthropic.claude-haiku-4-5"
+    );
+  });
+
+  it("strips 'apac.' prefix", () => {
+    expect(stripRegionPrefix("apac.anthropic.claude-haiku-4-5")).toBe(
+      "anthropic.claude-haiku-4-5"
+    );
+  });
+
+  it("strips 'us-gov.' prefix", () => {
+    expect(stripRegionPrefix("us-gov.anthropic.claude-haiku-4-5")).toBe(
+      "anthropic.claude-haiku-4-5"
+    );
+  });
+
+  it("leaves an unprefixed model id unchanged", () => {
+    expect(stripRegionPrefix("anthropic.claude-haiku-4-5")).toBe(
+      "anthropic.claude-haiku-4-5"
+    );
+  });
+
+  // TRIVIAL CONSIDERS: "global." cross-region inference profiles.
+  it("strips 'global.' prefix", () => {
+    expect(stripRegionPrefix("global.anthropic.claude-haiku-4-5")).toBe(
+      "anthropic.claude-haiku-4-5"
+    );
   });
 });
 

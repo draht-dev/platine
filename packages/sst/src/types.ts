@@ -122,6 +122,18 @@ export interface DrahtAgentProps {
    * @default "1024 MB"
    */
   memory?: `${number} MB`;
+
+  /**
+   * Path to a per-agent generated executor entry file (`.platine/executor.entry.ts`,
+   * produced by `platine build`), resolved relative to the SST run cwd.
+   *
+   * When set, the executor Lambda's handler is built from THIS file (statically
+   * importing the user's workflow.ts + `makeExecutorHandler` from
+   * `@draht/runtime-aws`) instead of the shared `@draht/runtime-aws/handlers`
+   * package entry. Only the executor Function switches — cron/ingress/resume
+   * handlers always use the shared package module.
+   */
+  entry?: string;
 }
 
 /**
@@ -135,6 +147,13 @@ export interface DrahtAgentOutput {
   queueUrl: unknown;
   /** HTTP endpoint URL, or undefined when no http channel is configured. */
   httpUrl: unknown;
+  /**
+   * Approval-resume Function URL (IAM-authenticated, `aws_iam` auth).
+   * Consumers sign requests with SigV4 (e.g. `platine runs approve` or the
+   * conformance harness) to POST { runId, actionId, decision } and resume a
+   * held run.
+   */
+  resumeUrl: unknown;
   /** EventBridge bus name (Pulumi Output<string>). */
   busName: unknown;
   /** DynamoDB table name (Pulumi Output<string>). */

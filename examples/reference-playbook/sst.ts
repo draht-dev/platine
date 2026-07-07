@@ -52,5 +52,11 @@ export function provisionSupportTriageAgent(): DrahtAgentOutput {
     // Timeout: set close to the 15-minute Lambda hard limit so the soft
     // time-budget (timeout − 3 min) has headroom for a ~12-minute run.
     timeout: "14 minutes",
+
+    // Executor entry: the per-agent generated entry file (produced by
+    // `platine build`) that statically imports workflow.ts + exports
+    // makeExecutorHandler({ workflow }), so the tool execute() closures are
+    // bundled into the executor Lambda artifact.
+    entry: "./.platine/executor.entry.ts",
   });
 }

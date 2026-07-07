@@ -20,6 +20,7 @@
  */
 
 import { readFileSync } from "node:fs";
+import { resolve as resolvePath } from "node:path";
 import { parseManifest } from "@draht/manifest";
 import type { Manifest } from "@draht/manifest";
 import { planResources } from "./plan.js";
@@ -67,6 +68,22 @@ function resolveHandlerPath(handlerExport: string): string {
   return `${noExt}.${handlerExport}`;
 }
 
+/**
+ * Resolve the handler path for a per-agent generated executor entry file
+ * (`.platine/executor.entry.ts`, produced by `platine build`).
+ *
+ * `props.entry` is resolved relative to the SST run cwd (mirrors how SST
+ * itself resolves relative paths in sst.config.ts). The resulting handler
+ * string is `"<abs-path-no-ext>.handler"` — same "<file>.<export>" convention
+ * resolveHandlerPath() uses for the shared package handlers, so SST's esbuild
+ * bundler traces + splits it identically.
+ */
+function resolveEntryHandlerPath(entry: string): string {
+  const absPath = resolvePath(process.cwd(), entry);
+  const noExt = absPath.replace(/\.(ts|js|cjs|mjs)$/, "");
+  return `${noExt}.handler`;
+}
+
 // ---------------------------------------------------------------------------
 // Agent factory
 // ---------------------------------------------------------------------------
@@ -88,7 +105,7 @@ function resolveHandlerPath(handlerExport: string): string {
  *  8.  Cron triggers → sst.aws.Cron per schedule trigger
  *  9.  HTTP routes  → router.route(path, fn) or Function URL
  * 10.  DLQ CloudWatch alarm → aws.cloudwatch.MetricAlarm
- * 11.  sst.Linkable → exposes {queueUrl, busName, tableName, httpUrl, manifestRevision}
+ * 11.  sst.Linkable → exposes {queueUrl, busName, tableName, httpUrl, resumeUrl, manifestRevision}
  */
 export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
   // 1. Resolve + parse manifest synchronously at Pulumi-program time.
@@ -182,14 +199,25 @@ export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
     tableName = (sharedStorage.table as { name: unknown }).name;
   }
 
-  // Executor handler path (resolved via require.resolve at Pulumi-program time).
+  // Executor handler path.
+  // When props.entry is set (the per-agent `.platine/executor.entry.ts` from
+  // `platine build`), the executor Function bundles THAT file — it statically
+  // imports the user's workflow.ts + makeExecutorHandler, so esbuild traces
+  // the tool execute() closures into the Lambda artifact. Otherwise fall back
+  // to the shared @draht/runtime-aws/handlers package entry (legacy path; no
+  // tool registry). ONLY the executor switches on props.entry — cron/ingress/
+  // resume handlers always use the shared package module.
   let executorHandlerPath: string;
-  try {
-    executorHandlerPath = resolveHandlerPath("executorHandler");
-  } catch {
-    // Fallback for environments where require.resolve is unavailable (e.g. ESM pure mode).
-    // The consumer must ensure @draht/runtime-aws is in node_modules.
-    executorHandlerPath = "node_modules/@draht/runtime-aws/dist/handlers/index.executorHandler";
+  if (props.entry !== undefined) {
+    executorHandlerPath = resolveEntryHandlerPath(props.entry);
+  } else {
+    try {
+      executorHandlerPath = resolveHandlerPath("executorHandler");
+    } catch {
+      // Fallback for environments where require.resolve is unavailable (e.g. ESM pure mode).
+      // The consumer must ensure @draht/runtime-aws is in node_modules.
+      executorHandlerPath = "node_modules/@draht/runtime-aws/dist/handlers/index.executorHandler";
+    }
   }
 
   // Build the link array for the executor function.
@@ -212,9 +240,32 @@ export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
 
   const busArn: unknown = (bus as { arn?: unknown }).arn ?? "*";
 
+  // Bedrock permission, scoped to the configured default model's foundation-model
+  // ARN (plan.bedrockPermission.resources) plus one account-scoped inference-profile
+  // ARN per region-prefixed model id (plan.bedrockInferenceProfileIds). The account
+  // id is only knowable inside the Pulumi program, so it is resolved here via
+  // aws.getCallerIdentityOutput() rather than in the pure planResources().
+  const accountId: unknown = plan.bedrockInferenceProfileIds.length > 0
+    ? aws.getCallerIdentityOutput().accountId
+    : undefined;
+  const bedrockPermissionEntry: Array<{ actions: string[]; resources: unknown[] }> =
+    plan.bedrockPermission !== null
+      ? [
+          {
+            actions: plan.bedrockPermission.actions as string[],
+            resources: [
+              ...(plan.bedrockPermission.resources as string[]),
+              ...plan.bedrockInferenceProfileIds.map(
+                (profileId) =>
+                  $util.interpolate`arn:aws:bedrock:*:${accountId as string}:inference-profile/${profileId}`
+              ),
+            ],
+          },
+        ]
+      : [];
+
   // Build permissions for the executor function.
   // SECURITY FIX (HIGH 4): scope IAM permissions to specific ARNs instead of "*".
-  // Bedrock InvokeModel remains "*" (model ARNs vary and are not knowable at deploy time).
   const executorPermissions: Array<{ actions: string[]; resources: unknown[] }> = [
     // SQS permissions — scoped to the agent's own queue and DLQ.
     { actions: ["sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"], resources: [queue.arn, dlq.arn] },
@@ -225,8 +276,10 @@ export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
       "dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:UpdateItem",
       "dynamodb:DeleteItem", "dynamodb:Query", "dynamodb:TransactWrite",
     ], resources: [tableArn, $util.interpolate`${tableArn as string}/index/*`] },
-    // Bedrock permissions (when applicable) — remains "*" (model ARNs are not static).
-    ...(plan.bedrockPermission !== null ? [plan.bedrockPermission as { actions: string[]; resources: string[] }] : []),
+    // Bedrock permissions (when applicable) — foundation-model ARN + per-region
+    // inference-profile ARNs (model-scoped with region wildcard; member regions
+    // are NOT enumerated individually — see plan.ts stripRegionPrefix()).
+    ...bedrockPermissionEntry,
     // Extra permissions from manifest + props.
     ...(plan.extraPermissions as Array<{ actions: string[]; resources: string[] }>),
   ] as Array<{ actions: string[]; resources: string[] }>;
@@ -237,6 +290,8 @@ export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
     DRAHT_QUEUE_URL: queue.url,
     DRAHT_BUS_NAME: (bus as { name: unknown }).name,
     DRAHT_TABLE_NAME: tableName,
+    DRAHT_MODEL_PROVIDER: plan.modelProvider,
+    DRAHT_DEFAULT_MODEL: plan.defaultModel,
     ...(plan.storageMode === "shared"
       ? { DRAHT_KEY_PREFIX: plan.sharedTableNamespace }
       : {}),
@@ -367,7 +422,7 @@ export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
     resumeHandlerPath = "node_modules/@draht/runtime-aws/dist/handlers/index.resumeHandler";
   }
 
-  new sst.aws.Function(`${name}Resume`, {
+  const resumeFn = new sst.aws.Function(`${name}Resume`, {
     handler: resumeHandlerPath,
     // SECURITY FIX (CRITICAL 1): require IAM auth on the resume endpoint.
     // A fully-public Function URL (url: true) allows anyone to POST and resolve
@@ -395,6 +450,7 @@ export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
       busName: (bus as { name: unknown }).name,
       tableName,
       httpUrl: httpUrl ?? null,
+      resumeUrl: resumeFn.url,
       manifestRevision: plan.manifestRevision,
     },
     include: [
@@ -419,6 +475,7 @@ export function Agent(name: string, props: DrahtAgentProps): DrahtAgentOutput {
   return {
     queueUrl: queue.url,
     httpUrl,
+    resumeUrl: resumeFn.url,
     busName: (bus as { name: unknown }).name,
     tableName,
     manifestRevision: plan.manifestRevision,

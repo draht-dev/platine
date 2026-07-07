@@ -10,7 +10,10 @@
  * Run `platine build` from this directory to produce it.
  *
  * The deployed stack exposes:
- *   - SupportTriageAgentUrl  — the Function URL endpoint for the HTTP channel
+ *   - SupportTriageAgentUrl              — the Function URL endpoint for the HTTP channel
+ *   - SupportTriageAgentTableName        — the DynamoDB table name
+ *   - SupportTriageAgentResumeUrl        — the IAM-authenticated approval-resume Function URL
+ *   - SupportTriageAgentManifestRevision — the manifest revision baked into the deployment
  *
  * Example end-to-end:
  *   1. platine build
@@ -39,9 +42,11 @@ export default $config({
 
     const supportTriageAgent = provisionSupportTriageAgent();
 
-    // Expose the HTTP endpoint as a stack output.
+    // Expose the HTTP endpoint + conformance-harness-required outputs.
     return {
       SupportTriageAgentUrl: supportTriageAgent.httpUrl,
+      SupportTriageAgentTableName: supportTriageAgent.tableName,
+      SupportTriageAgentResumeUrl: supportTriageAgent.resumeUrl,
       SupportTriageAgentManifestRevision: supportTriageAgent.manifestRevision,
     };
   },

@@ -12,9 +12,10 @@
 import { describe, it, expect } from "vitest";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { readFile } from "node:fs/promises";
+import { readFile, access } from "node:fs/promises";
 import { parseManifest } from "@draht/manifest";
 import { build } from "@draht/platine";
+import { buildToolRegistry } from "@draht/core/compile";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PLAYBOOK_DIR = __dirname;
@@ -110,5 +111,37 @@ describe("reference-playbook", () => {
     });
     expect(result.manifest.resume.holdsApproval).toBe(true);
     expect(result.manifest.resume.via).toBe("api");
+  });
+
+  it("platine build emits the executor entry file on disk", async () => {
+    const result = await build({
+      dir: PLAYBOOK_DIR,
+      skipTypecheck: true,
+      write: true,
+    });
+
+    expect(result.entryPath).toBeTruthy();
+    // Throws if the file does not exist — access() rejects on ENOENT.
+    await expect(access(result.entryPath)).resolves.toBeUndefined();
+  });
+
+  it("buildToolRegistry(workflow) covers every toolRef in the compiled manifest", async () => {
+    const result = await build({
+      dir: PLAYBOOK_DIR,
+      skipTypecheck: true,
+      write: false,
+    });
+    const { manifest } = result;
+
+    const mod = await import("./workflow.js");
+    const workflow = (mod as Record<string, unknown>)["default"] as Parameters<
+      typeof buildToolRegistry
+    >[0];
+
+    const registry = buildToolRegistry(workflow);
+
+    for (const tool of manifest.tools) {
+      expect(registry.has(tool.toolId)).toBe(true);
+    }
   });
 });

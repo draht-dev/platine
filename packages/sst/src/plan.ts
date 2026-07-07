@@ -103,6 +103,17 @@ export interface ResourcePlan {
   readonly manifestId: string;
   /** The manifest revision. */
   readonly manifestRevision: string;
+  /** props.model.provider, exposed so the executor Function's environment can be built. */
+  readonly modelProvider: "anthropic" | "bedrock";
+  /** props.model.defaultModel, exposed so the executor Function's environment can be built. */
+  readonly defaultModel: string;
+  /**
+   * Region-prefixed model IDs (defaultModel + fallbacks, whichever carry a
+   * region prefix) that need an account-scoped Bedrock inference-profile ARN
+   * granted in addition to the foundation-model ARN. Empty when none of the
+   * configured model IDs carry a region prefix.
+   */
+  readonly bedrockInferenceProfileIds: readonly string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -132,6 +143,34 @@ function parseMemoryMB(memory: `${number} MB` | undefined): number {
  */
 function computeVisibilityTimeout(timeoutSeconds: number): number {
   return Math.min(timeoutSeconds + 60, 43200);
+}
+
+/**
+ * Region-inference-profile prefixes that Bedrock strips to get the base
+ * foundation-model id. Order does not matter for correctness (no prefix is a
+ * proper prefix of another in this list), but is kept in spec order.
+ *
+ * "global." (TRIVIAL CONSIDERS): Bedrock's global cross-region inference
+ * profiles (e.g. "global.anthropic.claude-...") use this prefix in addition
+ * to the per-geography ones above.
+ */
+const REGION_PREFIXES = ["eu.", "us.", "apac.", "us-gov.", "global."] as const;
+
+/**
+ * Strip a Bedrock cross-region inference-profile prefix (`eu.`, `us.`,
+ * `apac.`, `us-gov.`, `global.`) from a model id, returning the base
+ * foundation-model id. Ids with no recognised prefix are returned unchanged.
+ *
+ * Pure helper — used both to scope the foundation-model IAM ARN and to detect
+ * which model ids need an additional account-scoped inference-profile ARN.
+ */
+export function stripRegionPrefix(modelId: string): string {
+  for (const prefix of REGION_PREFIXES) {
+    if (modelId.startsWith(prefix)) {
+      return modelId.slice(prefix.length);
+    }
+  }
+  return modelId;
 }
 
 /**
@@ -237,12 +276,29 @@ export function planResources(
     manifest.resources.needsBedrock === true ||
     props.model.provider === "bedrock";
 
+  // SECURITY FIX: scope the Bedrock foundation-model ARN to the configured
+  // default model instead of "*". Region-prefixed model ids (cross-region
+  // inference profiles, e.g. "eu.anthropic.claude-haiku-4-5") are stripped
+  // back to their base foundation-model id for this ARN; the region-prefixed
+  // id itself is granted separately as an account-scoped inference-profile
+  // ARN (see bedrockInferenceProfileIds below + index.ts).
+  const baseModelId = stripRegionPrefix(props.model.defaultModel);
+
   const bedrockPermission: IamPermission | null = needsBedrock
     ? {
         actions: ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
-        resources: ["*"],
+        resources: [`arn:aws:bedrock:*::foundation-model/${baseModelId}`],
       }
     : null;
+
+  // ── Bedrock cross-region inference-profile ids ──────────────────────────
+  // Any configured model id (default or fallback) that carries a region
+  // prefix needs an additional account-scoped inference-profile ARN granted
+  // in index.ts (accountId is only knowable inside the Pulumi program).
+  const allModelIds = [props.model.defaultModel, ...(props.model.fallbacks ?? [])];
+  const bedrockInferenceProfileIds: string[] = allModelIds.filter(
+    (id) => stripRegionPrefix(id) !== id
+  );
 
   // Extra permissions: merge manifest.resources.extraIam + props.permissions.
   const extraPermissions: IamPermission[] = [
@@ -280,5 +336,8 @@ export function planResources(
     manifestBlob,
     manifestId: manifest.agent.agentId,
     manifestRevision: manifest.revision,
+    modelProvider: props.model.provider,
+    defaultModel: props.model.defaultModel,
+    bedrockInferenceProfileIds,
   };
 }
