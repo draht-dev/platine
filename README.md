@@ -66,10 +66,13 @@ seam so a durable engine (Temporal/Restate) can replace it in v2 with no rewrite
 ## Status
 P0–P9 built and verified; the deploy gate (T2/T3/T5/T6) proven on a real throwaway AWS
 stage; the typed-graph wedge (T1/T4) proven by a CI fixture gate + an independent
-adversarial probe. **Read [`docs/v1-status.md`](docs/v1-status.md)** for the full
-acceptance results, the security posture, and the honest list of v1.x gaps — most
-importantly: the *deployed* executor currently stubs user tool `execute()` (bundling user
-tool code into the Lambda is the top v1.x item).
+adversarial probe. The deployed executor now bundles and runs the agent's real tool
+`execute()` code with a real Bedrock/Anthropic model (`platine build` emits the executor
+entry; the SST factory wires it), fanout `elementSubgraph`s execute per item with durable
+checkpoints, and an automated real-AWS conformance gate exists (`conformance/`,
+neutral-skipped until CI AWS credentials are provisioned). **Read
+[`docs/v1-status.md`](docs/v1-status.md)** for the full acceptance results, the security
+posture, and the honest list of remaining v1.x gaps.
 
 ## Develop
 ```
