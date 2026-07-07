@@ -4,7 +4,9 @@ packages:
   - 'fixtures/*'
   - 'conformance'
 allowBuilds:
-  esbuild: set this to true or false
+  # esbuild's postinstall installs the platform binary; required for the
+  # bundle-seam smoke test and SST's bundling.
+  esbuild: true
 minimumReleaseAgeExclude:
   - '@typescript/native-preview-darwin-arm64@7.0.0-dev.20260619.1'
   - '@typescript/native-preview-darwin-x64@7.0.0-dev.20260619.1'
