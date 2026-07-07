@@ -60,9 +60,14 @@ export interface Storage {
   getPendingByAction(actionId: string): Promise<ApprovalRow | null>;
 
   /**
-   * Look up the most recent approval row for a given (runId, nodeId).
-   * Returns null if no row exists. Used by drive() to detect already-granted
-   * approvals and skip the re-hold gate.
+   * Look up the approval row for a given (runId, nodeId). Returns null if no
+   * row exists. Used by drive() to detect already-granted approvals and skip
+   * the re-hold gate.
+   *
+   * MUST be deterministic even if multiple rows exist for the same
+   * (runId, nodeId) (e.g. from historical duplicate-row bugs, or a
+   * rejected-then-re-held sequence): prefer a resolved row (approved/rejected)
+   * over a pending one, tiebreak by the newest createdAt.
    */
   getApprovalByStep(t: TenantId, runId: RunId, nodeId: string): Promise<ApprovalRow | null>;
 }

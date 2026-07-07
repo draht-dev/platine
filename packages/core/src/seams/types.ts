@@ -106,6 +106,15 @@ export interface ApprovalRow {
   status: "pending" | "approved" | "rejected";
   idempotencyKey: string;
   decidedBy?: string;
+  /**
+   * ISO-8601 creation timestamp. Optional for backward-compatible reads of
+   * pre-existing rows written before this field existed. Used by
+   * DynamoStorage.getApprovalByStep to deterministically pick a winner when
+   * multiple rows exist for the same (runId, nodeId) — prefer a
+   * resolved (approved/rejected) row over a pending one, tiebreak by the
+   * newest createdAt.
+   */
+  createdAt?: string;
 }
 
 export interface FanoutItemRow {

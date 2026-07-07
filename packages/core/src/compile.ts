@@ -254,6 +254,37 @@ function contentHash(content: string): string {
 // ---------------------------------------------------------------------------
 
 /**
+ * buildToolRegistry — walk a WorkflowDef's nodes and collect every "tool" /
+ * "unsafe" node's ToolDef, keyed by the SAME `"tool_" + node.id` scheme
+ * compileWorkflow uses for `toolRef` / `toolId` in the Manifest.
+ *
+ * This is the SOLE place that scheme is implemented — compileWorkflow calls
+ * this function for its own tool collection (below) so the manifest's
+ * `toolRef`/`toolId` values and this registry's keys can never drift apart.
+ *
+ * The runtime executor (RealToolsDispatcher in @draht/runtime-aws) builds its
+ * in-process tool registry from this function, keyed identically to how
+ * `node.toolRef` is resolved at dispatch time — the ToolDef's `execute()`
+ * closure lives ONLY on RecordedNode.def (never serialized into the Manifest).
+ */
+export function buildToolRegistry(
+  wf: WorkflowDef
+): Map<string, ToolDef<Schema, Schema>> {
+  const registry = new Map<string, ToolDef<Schema, Schema>>();
+
+  for (const node of wf.nodes) {
+    if ((node.kind === "tool" || node.kind === "unsafe") && node.def) {
+      const toolDef = node.def as ToolDef<Schema, Schema>;
+      // Use the node id as the tool id for now (could be refined with a name field)
+      const toolId = `tool_${node.id}`;
+      registry.set(toolId, toolDef);
+    }
+  }
+
+  return registry;
+}
+
+/**
  * Compile a WorkflowDef into a Manifest.
  *
  * This is the SOLE writer of compiler-computed fields:
@@ -278,16 +309,7 @@ export function compileWorkflow(
   // -------------------------------------------------------------------------
   // 1. Collect tools referenced in tool nodes
   // -------------------------------------------------------------------------
-  const toolDefs = new Map<string, ToolDef<Schema, Schema>>();
-
-  for (const node of wf.nodes) {
-    if ((node.kind === "tool" || node.kind === "unsafe") && node.def) {
-      const toolDef = node.def as ToolDef<Schema, Schema>;
-      // Use the node id as the tool id for now (could be refined with a name field)
-      const toolId = `tool_${node.id}`;
-      toolDefs.set(toolId, toolDef);
-    }
-  }
+  const toolDefs = buildToolRegistry(wf);
 
   // -------------------------------------------------------------------------
   // 2. Build manifest nodes
@@ -403,37 +425,14 @@ export function compileWorkflow(
     }
 
     if (node.kind === "fanout") {
-      // Fanout nodes wrap a sub-workflow (elementSubgraph).
-      // Collect all node IDs in the fanout body.
-      const elementSubgraph: string[] = [];
-      if (node.fanoutBody) {
-        // Run the fanout body with a mock item handle to collect inner nodes.
-        // This is a shallow inspection — we don't recurse into nested fanouts.
-        const mockBuilder = new (
-          class {
-            _inner: string[] = [];
-            node<I extends Schema, O extends Schema>(
-              _def: ToolDef<I, O>,
-              _from: unknown,
-              _mapper: unknown
-            ) {
-              const id = `fanout_inner_${Math.random().toString(36).slice(2, 8)}`;
-              this._inner.push(id);
-              return { id, __fanout: undefined as never };
-            }
-          }
-        )();
-        try {
-          const itemHandle = {
-            id: `${node.id}_item`,
-            __fanout: undefined as never,
-          };
-          node.fanoutBody(itemHandle as unknown as import("./define-workflow.js").NodeHandle<unknown>);
-        } catch {
-          // ignore — best effort
-        }
-        elementSubgraph.push(...mockBuilder._inner);
-      }
+      // Fanout nodes wrap a sub-workflow (elementSubgraph). The sub-recording
+      // builder (define-workflow.ts::fanout()) already invoked the body
+      // EAGERLY against the real builder at graph-construction time, and
+      // captured the resulting node ids (in recorded/topological order) onto
+      // node.subNodeIds. Those sub-nodes are ALREADY present in wf.nodes (and
+      // their internal edges in wf.edges) — the main loop above / edge loop
+      // below emit them like any other node, so all we do here is list them.
+      const elementSubgraph: string[] = [...(node.subNodeIds ?? [])];
 
       manifestNodes.push({
         nodeId: node.id,
@@ -441,6 +440,13 @@ export function compileWorkflow(
         kind: "fanout",
         elementSubgraph,
         concurrency: node.concurrency ?? 5,
+        // SHOULD-FIX 4: thread through the body's actually-RETURNED handle id
+        // (see define-workflow.ts::fanout()'s terminalSubNodeId capture) so
+        // the executor collects the right per-item output even when the body
+        // recorded additional nodes after the one it returned.
+        ...(node.terminalSubNodeId !== undefined
+          ? { terminalSubNodeId: node.terminalSubNodeId }
+          : {}),
       });
       continue;
     }

@@ -426,6 +426,18 @@ describe("defineWorkflow — FanoutHandle brand safety", () => {
     const nodeKinds = wf.nodes.map((n) => n.kind);
     expect(nodeKinds).toContain("split");
     expect(nodeKinds).toContain("fanout");
+
+    // The fanout body's inner b.transform() call must be sub-recorded: the
+    // resulting transform node lives in wf.nodes (so buildToolRegistry / the
+    // compiler find it for free), and the fanout RecordedNode's subNodeIds
+    // indexes it as the elementSubgraph member.
+    const fanoutNode = wf.nodes.find((n) => n.kind === "fanout");
+    expect(fanoutNode?.subNodeIds).toBeDefined();
+    expect(fanoutNode?.subNodeIds?.length).toBe(1);
+    const innerId = fanoutNode!.subNodeIds![0]!;
+    const innerNode = wf.nodes.find((n) => n.id === innerId);
+    expect(innerNode).toBeDefined();
+    expect(innerNode?.kind).toBe("transform");
   });
 
   // The following would be a TYPE ERROR at compile time:
@@ -511,5 +523,45 @@ describe("defineWorkflow — compile with schedule trigger", () => {
     if (trigger?.type === "schedule") {
       expect(trigger.cron).toBe("0 8 * * *");
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// SHOULD-FIX 3a — per-instance node-id counter (no cross-workflow id drift)
+// ---------------------------------------------------------------------------
+
+describe("defineWorkflow — node-id counter is per-instance, not module-global", () => {
+  it("a SECOND defineWorkflow() build in the same process starts its own node ids at the same origin as the FIRST — NOT offset by the first workflow's node count", () => {
+    // Deliberately do NOT call _resetNodeCounter() between these two builds —
+    // that's the whole point: before the SHOULD-FIX 3a fix, a module-global
+    // counter meant "agent B" (built second, e.g. two `platine build` targets
+    // processed in one process) would have its ids shifted by however many
+    // nodes "agent A" had already recorded.
+    const wfA = defineWorkflow((b) => {
+      const t = b.trigger({ type: "manual", payload: z.object({ body: z.string() }) });
+      const c1 = b.node(classifyTool, t, (p) => ({ body: p.body }));
+      const c2 = b.node(
+        createTicketTool,
+        c1,
+        (out) => ({ subject: out.summary, priority: out.severity }),
+        { requiresApproval: true },
+      );
+      return b.output(c2);
+    });
+
+    const wfB = defineWorkflow((b) => {
+      const t = b.trigger({ type: "manual", payload: z.object({ body: z.string() }) });
+      const c = b.node(classifyTool, t, (p) => ({ body: p.body }));
+      return b.output(c);
+    });
+
+    // wfA recorded trigger_1, agent/tool_2 (classify), tool_3 (createTicket), output_4.
+    const wfAIds = wfA.nodes.map((n) => n.id);
+    expect(wfAIds).toEqual(["trigger_1", "tool_2", "tool_3", "output_4"]);
+
+    // wfB — built SECOND, in the same process — must start at trigger_1 again,
+    // NOT trigger_5 (which is what the old module-global counter would produce).
+    const wfBIds = wfB.nodes.map((n) => n.id);
+    expect(wfBIds).toEqual(["trigger_1", "tool_2", "output_3"]);
   });
 });

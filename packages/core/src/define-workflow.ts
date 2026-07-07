@@ -123,8 +123,27 @@ export interface RecordedNode {
   readonly mapper?: (out: unknown) => unknown;
   /** The pure transform function (transform nodes). */
   readonly fn?: (out: unknown) => unknown;
-  /** The fanout body function (fanout nodes). */
+  /** The fanout body function (fanout nodes). Retained for introspection —
+   * compile.ts no longer invokes it; the sub-recording in `fanout()` already
+   * captured the resulting nodes/edges into subNodeIds below. */
   readonly fanoutBody?: (item: NodeHandle<unknown>) => NodeHandle<unknown>;
+  /**
+   * The ids of nodes recorded while eagerly invoking the fanout body against
+   * THIS builder (fanout nodes only), in recorded (topological) order. These
+   * ids are already present in the enclosing WorkflowDef's `nodes` array —
+   * this field is just the "which of wf.nodes belong to THIS fanout's
+   * elementSubgraph" index that compile.ts reads to emit `elementSubgraph`.
+   */
+  readonly subNodeIds?: readonly string[];
+  /**
+   * SHOULD-FIX 4: the id of the node the fanout body ACTUALLY RETURNED
+   * (fanout nodes only) — i.e. `body(itemHandle)`'s return value, captured in
+   * `fanout()`. This is the sub-node whose per-item output the executor must
+   * collect as the fanout's result. It is NOT necessarily the last id in
+   * subNodeIds / the last-topo-order member: a body may record additional
+   * nodes (e.g. an audit/logging node) AFTER the handle it returns.
+   */
+  readonly terminalSubNodeId?: string;
   /** Concurrency for fanout nodes. */
   readonly concurrency?: number;
   /** The merge source IDs (merge nodes). */
@@ -298,21 +317,31 @@ export interface WorkflowCompileOptions {
 // Builder implementation — the runtime recording machinery
 // ---------------------------------------------------------------------------
 
-let _nodeCounter = 0;
-
-function nextId(prefix: string): string {
-  _nodeCounter += 1;
-  return `${prefix}_${_nodeCounter}`;
-}
-
-/** Resets the node counter (used in tests to get deterministic IDs). */
+/**
+ * @deprecated no-op — retained for source compatibility with call sites that
+ * still invoke it (e.g. tests written before the SHOULD-FIX 3a change). The
+ * node-id counter now lives on each BuilderImpl INSTANCE (see
+ * BuilderImpl._nodeCounter / nextId), not a module-global, so every
+ * `defineWorkflow()` call already starts its own counter at 0 regardless of
+ * import environment/order — there is nothing left to reset. Two
+ * programmatic build() calls in the SAME process no longer shift each
+ * other's ids (the module-global was the bug: agent B's ids used to be
+ * offset by however many nodes agent A had already recorded).
+ */
 export function _resetNodeCounter(): void {
-  _nodeCounter = 0;
+  // Intentionally empty.
 }
 
 class BuilderImpl implements Builder {
   readonly _nodes: RecordedNode[] = [];
   readonly _edges: RecordedEdge[] = [];
+  /** Per-instance node-id counter — see the _resetNodeCounter() doc comment above. */
+  private _nodeCounter = 0;
+
+  private _nextId(prefix: string): string {
+    this._nodeCounter += 1;
+    return `${prefix}_${this._nodeCounter}`;
+  }
 
   private _addNode(node: RecordedNode): void {
     this._nodes.push(node);
@@ -329,7 +358,7 @@ class BuilderImpl implements Builder {
   trigger<P extends Schema>(
     cfg: TriggerConfig & { payload: P }
   ): NodeHandle<Infer<P>> {
-    const id = nextId("trigger");
+    const id = this._nextId("trigger");
     this._addNode({
       id,
       kind: "trigger",
@@ -352,7 +381,7 @@ class BuilderImpl implements Builder {
       ? def.__agentDef
       : (def as unknown as ToolDef<Schema, Schema>);
 
-    const id = nextId(kind);
+    const id = this._nextId(kind);
     this._addNode({
       id,
       kind,
@@ -370,7 +399,7 @@ class BuilderImpl implements Builder {
     from: NodeHandle<Up>,
     fn: (out: Up) => Out
   ): NodeHandle<Out> {
-    const id = nextId("transform");
+    const id = this._nextId("transform");
     this._addNode({
       id,
       kind: "transform",
@@ -383,7 +412,7 @@ class BuilderImpl implements Builder {
   split<Up extends readonly unknown[]>(
     from: NodeHandle<Up>
   ): FanoutHandle<Up[number]> {
-    const id = nextId("split");
+    const id = this._nextId("split");
     this._addNode({
       id,
       kind: "split",
@@ -397,11 +426,40 @@ class BuilderImpl implements Builder {
     body: (item: NodeHandle<Elem>) => NodeHandle<R>,
     opts?: { concurrency?: number }
   ): NodeHandle<R[]> {
-    const id = nextId("fanout");
+    const id = this._nextId("fanout");
+
+    // Sub-recording: invoke the body EAGERLY, right now, against THIS builder
+    // (not a mock) — so any b.node/b.transform/... calls inside the closure
+    // are recorded into the SAME this._nodes/this._edges arrays the rest of
+    // the graph uses. This is what makes elementSubgraph non-empty: the old
+    // approach stashed the closure and had compile.ts call it later against a
+    // disposable mock builder that was never wired as `b`, so it always
+    // recorded zero inner nodes. It also means buildToolRegistry finds
+    // sub-recorded tool nodes for free — they live in wf.nodes like any other.
+    //
+    // The synthetic itemHandle's id is never added as a real node, so the
+    // edge from it into the body's first real node has a source that's absent
+    // from the emitted manifest.nodes — compile.ts drops that edge, which is
+    // exactly what identifies the body's first node as the subgraph's entry
+    // (the member with no in-subgraph upstream edge).
+    const captureStart = this._nodes.length;
+    const itemHandle: NodeHandle<Elem> = { id: `${id}_item` } as NodeHandle<Elem>;
+    // SHOULD-FIX 4: capture the body's RETURNED handle id — this is the node
+    // whose per-item output the fanout must collect, which is NOT necessarily
+    // the last-recorded / last-topo-order sub-node (a body can record an
+    // audit/logging node AFTER the handle it actually returns). Discarding
+    // this return value (the old behavior) silently let the executor collect
+    // whichever sub-node happened to sort last, instead of what the body
+    // actually returned.
+    const terminalHandle = body(itemHandle);
+    const subNodeIds = this._nodes.slice(captureStart).map((n) => n.id);
+
     this._addNode({
       id,
       kind: "fanout",
       fanoutBody: body as (item: NodeHandle<unknown>) => NodeHandle<unknown>,
+      subNodeIds,
+      terminalSubNodeId: terminalHandle.id,
       ...(opts?.concurrency !== undefined ? { concurrency: opts.concurrency } : {}),
     });
     this._addEdge(from.id, id);
@@ -409,7 +467,7 @@ class BuilderImpl implements Builder {
   }
 
   merge<A, B>(a: NodeHandle<A>, b: NodeHandle<B>): NodeHandle<A & B> {
-    const id = nextId("merge");
+    const id = this._nextId("merge");
     this._addNode({
       id,
       kind: "merge",
@@ -421,7 +479,7 @@ class BuilderImpl implements Builder {
   }
 
   output<T>(h: NodeHandle<T>): NodeHandle<T> {
-    const id = nextId("output");
+    const id = this._nextId("output");
     this._addNode({
       id,
       kind: "output",
@@ -436,7 +494,7 @@ class BuilderImpl implements Builder {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     mapper: (out: Up) => any
   ): NodeHandle<Infer<O>> {
-    const id = nextId("unsafe");
+    const id = this._nextId("unsafe");
     this._addNode({
       id,
       kind: "unsafe",

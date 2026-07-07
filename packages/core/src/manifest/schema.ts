@@ -147,6 +147,15 @@ export const NodeZ = z
         kind: z.literal("fanout"),
         elementSubgraph: z.array(z.string()),
         concurrency: z.number().int().default(5),
+        /**
+         * SHOULD-FIX 4: the elementSubgraph member whose per-item output the
+         * executor collects as the fanout's result — i.e. the node the
+         * workflow's fanout body function actually RETURNED, which is not
+         * necessarily the last-topo-order member. Optional for backward
+         * compatibility with manifests compiled before this field existed;
+         * the executor falls back to the last-topo-order member when absent.
+         */
+        terminalSubNodeId: z.string().optional(),
       }),
     ])
   );
