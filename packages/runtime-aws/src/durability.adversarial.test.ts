@@ -255,13 +255,17 @@ describe("ATTACK 3: approval", () => {
     expect(tools.getCallCount("danger")).toBe(0); // tool NOT run
   });
 
-  it("A3b: approval resolution idempotent on (runId,stepId) — createPendingApproval dedupes", async () => {
+  it("A3b: approval resolution idempotent on (runId,stepId) — createPendingApproval dedupes, hold() returns the SAME actionId (no dangling actionId)", async () => {
     const storage = new MemoryStorage();
     const approvals = new FakeApprovalsCoordinator(storage);
     const id1 = await approvals.hold({ runId: "r" as RunId, tenantId: TENANT, nodeId: "n", toolName: "t", paramsJson: "{}", idempotencyKey: "k" });
     const id2 = await approvals.hold({ runId: "r" as RunId, tenantId: TENANT, nodeId: "n", toolName: "t", paramsJson: "{}", idempotencyKey: "k" });
-    // Two distinct actionIds generated, but only ONE approval row persisted (idempotent on runId,stepId)
-    expect(id1).not.toBe(id2);
+    // MAJOR 2 fix: hold() now checks getApprovalByStep BEFORE minting a new
+    // actionId, so a second hold() for the same (runId, nodeId) returns the
+    // EXISTING actionId rather than a freshly-minted one that would never be
+    // stored (the old behavior left a "dangling" actionId the caller could
+    // never resolve or look up — see runtime-local.ts's hold()).
+    expect(id1).toBe(id2);
     expect(storage.getApprovals().size).toBe(1);
   });
 

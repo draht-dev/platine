@@ -203,12 +203,16 @@ export class MemoryStorage implements Storage {
   }
 
   async createPendingApproval(a: ApprovalRow): Promise<void> {
-    // Idempotent on (runId, stepId)
+    // Idempotent on (runId, stepId) — first writer wins, later duplicate
+    // calls are dropped. MAJOR 2 fix: callers (FakeApprovalsCoordinator.hold)
+    // MUST check getApprovalByStep for an existing row BEFORE minting a new
+    // actionId, so this no-op path never leaves a caller holding a
+    // never-stored ("dangling") actionId.
     const existingKey = [...this.approvals.values()].find(
       (r) => r.runId === a.runId && r.stepId === a.stepId,
     );
     if (existingKey) return;
-    this.approvals.set(a.actionId, a);
+    this.approvals.set(a.actionId, { ...a, createdAt: a.createdAt ?? new Date().toISOString() });
   }
 
   async resolveApproval(actionId: string, verdict: "approved" | "rejected"): Promise<void> {
@@ -225,16 +229,28 @@ export class MemoryStorage implements Storage {
   }
 
   async getApprovalByStep(_t: TenantId, runId: RunId, nodeId: string): Promise<ApprovalRow | null> {
-    // HOLE B FIX: return the MOST RECENT matching row (last-inserted), per the seam spec
-    // (storage.ts:62-67). Iterating in insertion order and keeping the last match ensures
-    // that a later approved row is not shadowed by an earlier rejected row.
-    let result: ApprovalRow | null = null;
+    // MAJOR 2 fix: deterministically prefer a resolved row (approved/rejected)
+    // over a pending one, tiebreak by newest createdAt — mirrors
+    // DynamoStorage.getApprovalByStep so both Storage implementations agree
+    // (a later approved row is never shadowed by an earlier-or-later pending
+    // duplicate).
+    const rank = (s: ApprovalRow["status"]): number => (s === "pending" ? 0 : 1);
+    let best: ApprovalRow | null = null;
     for (const row of this.approvals.values()) {
-      if (row.runId === runId && row.nodeId === nodeId) {
-        result = row;
+      if (row.runId !== runId || row.nodeId !== nodeId) continue;
+      if (best === null) {
+        best = row;
+        continue;
+      }
+      const rowRank = rank(row.status);
+      const bestRank = rank(best.status);
+      if (rowRank !== bestRank) {
+        if (rowRank > bestRank) best = row;
+      } else if ((row.createdAt ?? "") >= (best.createdAt ?? "")) {
+        best = row;
       }
     }
-    return result;
+    return best;
   }
 
   // Expose internals for testing
@@ -476,6 +492,14 @@ export class FakeApprovalsCoordinator implements ApprovalsCoordinator {
     paramsJson: string;
     idempotencyKey: string;
   }): Promise<string> {
+    // MAJOR 2 fix: check for an existing row for (runId, nodeId) BEFORE
+    // minting a new actionId. MemoryStorage.createPendingApproval no-ops on a
+    // duplicate (runId, stepId) — without this check, hold() would still
+    // return the freshly-minted actionId even though it was never stored
+    // (a "dangling" actionId the caller can never resolve or look up).
+    const existing = await this.storage.getApprovalByStep(params.tenantId, params.runId, params.nodeId);
+    if (existing !== null) return existing.actionId;
+
     // SECURITY FIX (CRITICAL 2): use crypto.randomUUID() to match the production
     // StorageApprovalsCoordinator's unguessable actionId scheme.
     const actionId = `action_${randomUUID()}`;
@@ -504,7 +528,12 @@ interface LocalRuntimeDeps {
   eventBus: MemoryBus;
   tenancy: MemoryTenancy;
   model: Model;
-  tools: FakeToolsDispatcher;
+  /**
+   * Any ToolsDispatcher — FakeToolsDispatcher by default (tests), or a real
+   * dispatcher (e.g. RealToolsDispatcher) injected by `platine dev` so the
+   * user's authored tool `execute()` code actually runs in-process.
+   */
+  tools: ToolsDispatcher;
   approvals: FakeApprovalsCoordinator;
 }
 
@@ -650,26 +679,37 @@ export class LocalRuntime implements Runtime {
 // createLocalRuntime — factory function for tests
 // ---------------------------------------------------------------------------
 
-export interface LocalRuntimeOptions {
+/**
+ * `T` defaults to FakeToolsDispatcher so every existing caller that omits
+ * `tools` (or passes a FakeToolsDispatcher) keeps its exact prior static type
+ * (including `.register()`/`.getCallCount()` on the returned `tools`).
+ * Callers that inject a different ToolsDispatcher (e.g. `platine dev`'s
+ * RealToolsDispatcher) get `T` inferred as that dispatcher's own type instead.
+ */
+export interface LocalRuntimeOptions<T extends ToolsDispatcher = FakeToolsDispatcher> {
   model: Model;
-  tools?: FakeToolsDispatcher;
+  tools?: T;
   tenantId?: TenantId;
 }
 
-export function createLocalRuntime(opts: LocalRuntimeOptions): {
+export function createLocalRuntime<T extends ToolsDispatcher = FakeToolsDispatcher>(
+  opts: LocalRuntimeOptions<T>,
+): {
   runtime: LocalRuntime;
   storage: MemoryStorage;
   queue: MemoryQueue;
   bus: MemoryBus;
   tenancy: MemoryTenancy;
-  tools: FakeToolsDispatcher;
+  tools: T;
   approvals: FakeApprovalsCoordinator;
 } {
   const storage = new MemoryStorage();
   const queue = new MemoryQueue();
   const bus = new MemoryBus();
   const tenancy = new MemoryTenancy();
-  const tools = opts.tools ?? new FakeToolsDispatcher();
+  // Safe: FakeToolsDispatcher satisfies the `T extends ToolsDispatcher` bound,
+  // and is only ever used as the fallback when `opts.tools` (typed `T`) is absent.
+  const tools = (opts.tools ?? new FakeToolsDispatcher()) as T;
   const approvals = new FakeApprovalsCoordinator(storage);
   const tenantId = opts.tenantId ?? DEFAULT_TENANT;
 

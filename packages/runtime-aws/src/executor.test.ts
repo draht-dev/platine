@@ -1000,6 +1000,467 @@ describe("fanout resume", () => {
 });
 
 // ---------------------------------------------------------------------------
+// 14. Fanout elementSubgraph execution (Phase 2, task 2.2)
+// ---------------------------------------------------------------------------
+
+describe("fanout elementSubgraph execution", () => {
+  it("1-node subgraph transforms every item (not a passthrough)", async () => {
+    const storage = new MemoryStorage();
+
+    const manifest = makeManifest({
+      tools: [
+        {
+          toolId: "double_it",
+          name: "double_it",
+          description: "doubles n",
+          kind: "local",
+          inputSchema: { type: "object", properties: {}, required: [] },
+          requiresApproval: false,
+          dangerous: false,
+        },
+      ],
+      nodes: [
+        {
+          nodeId: "fanout_node",
+          kind: "fanout",
+          elementSubgraph: ["sub_double"],
+          concurrency: 2,
+          outputSchema: [],
+        },
+        {
+          nodeId: "sub_double",
+          kind: "tool",
+          toolRef: "double_it",
+          requiresApproval: false,
+          params: {},
+          outputSchema: [],
+        },
+      ],
+      edges: [],
+      resume: { via: "api", holdsApproval: false },
+    });
+
+    const runId = "run_subgraph_1node" as RunId;
+    await bootstrapRun(storage, manifest, runId, { __items: [{ n: 1 }, { n: 2 }, { n: 3 }, { n: 4 }] });
+
+    const tools = new FakeToolsDispatcher();
+    tools.register("double_it", async (input) => ({ n: (input["n"] as number) * 2 }));
+
+    const deps = makeDeps(storage, { tools });
+    await drive(makeCtx(runId), deps);
+
+    const run = await storage.getRun(TENANT, runId);
+    expect(run?.status).toBe("completed");
+    expect(tools.getCallCount("double_it")).toBe(4);
+
+    // The subgraph must actually transform each item — not pass it through.
+    const outputs = await storage.loadStepOutputs(TENANT, runId);
+    expect(outputs.get("fanout_node")).toEqual([{ n: 2 }, { n: 4 }, { n: 6 }, { n: 8 }]);
+
+    // Per-item checkpoints + per-item ledger rows for the sub-node.
+    for (let idx = 0; idx < 4; idx++) {
+      expect(outputs.get(`FANOUT#fanout_node#${idx}`)).toEqual({ n: (idx + 1) * 2 });
+      const ledgerRow = await storage.hasSideEffect(TENANT, runId, `fanout_node#${idx}#sub_double`);
+      expect(ledgerRow).not.toBeNull();
+    }
+  });
+
+  it("SHOULD-FIX 5: multi-root elementSubgraph — EVERY zero-in-degree member gets the raw item, not just one", async () => {
+    const storage = new MemoryStorage();
+
+    const manifest = makeManifest({
+      tools: [
+        {
+          toolId: "root_a_tool",
+          name: "root_a_tool",
+          description: "root A: reads n directly off the raw item",
+          kind: "local",
+          inputSchema: { type: "object", properties: {}, required: [] },
+          requiresApproval: false,
+          dangerous: false,
+        },
+        {
+          toolId: "root_b_tool",
+          name: "root_b_tool",
+          description: "root B: ALSO reads n directly off the raw item (second root)",
+          kind: "local",
+          inputSchema: { type: "object", properties: {}, required: [] },
+          requiresApproval: false,
+          dangerous: false,
+        },
+        {
+          toolId: "combine_tool",
+          name: "combine_tool",
+          description: "merges both roots' outputs",
+          kind: "local",
+          inputSchema: { type: "object", properties: {}, required: [] },
+          requiresApproval: false,
+          dangerous: false,
+        },
+      ],
+      nodes: [
+        {
+          nodeId: "fanout_node",
+          kind: "fanout",
+          elementSubgraph: ["root_a", "root_b", "combine"],
+          // SHOULD-FIX 4 field — identifies "combine" as the body's actual
+          // return value (irrelevant to THIS test's multi-root assertion,
+          // but required for the fanout's collected output to be "combine"'s).
+          terminalSubNodeId: "combine",
+          concurrency: 2,
+          outputSchema: [],
+        },
+        { nodeId: "root_a", kind: "tool", toolRef: "root_a_tool", requiresApproval: false, params: {}, outputSchema: [] },
+        { nodeId: "root_b", kind: "tool", toolRef: "root_b_tool", requiresApproval: false, params: {}, outputSchema: [] },
+        { nodeId: "combine", kind: "tool", toolRef: "combine_tool", requiresApproval: false, params: {}, outputSchema: [] },
+      ],
+      // Both root_a and root_b feed into combine; NEITHER has an in-subgraph
+      // upstream edge, so BOTH are zero-in-degree "roots" of this elementSubgraph.
+      edges: [
+        { edgeId: "e_a_combine", source: "root_a", target: "combine" },
+        { edgeId: "e_b_combine", source: "root_b", target: "combine" },
+      ],
+      resume: { via: "api", holdsApproval: false },
+    });
+
+    const runId = "run_subgraph_multiroot" as RunId;
+    await bootstrapRun(storage, manifest, runId, { __items: [{ n: 1 }, { n: 2 }] });
+
+    const tools = new FakeToolsDispatcher();
+    // If root_b never received the raw item (pre-fix bug), input["n"] would be
+    // undefined here — use a distinguishable sentinel so a wrong ({}) input is
+    // impossible to confuse with a correct one.
+    tools.register("root_a_tool", async (input) => ({
+      aVal: typeof input["n"] === "number" ? input["n"] * 10 : "MISSING_A",
+    }));
+    tools.register("root_b_tool", async (input) => ({
+      bVal: typeof input["n"] === "number" ? input["n"] * 100 : "MISSING_B",
+    }));
+    // combine receives the shallow-merged outputs of BOTH roots.
+    tools.register("combine_tool", async (input) => ({ combined: input }));
+
+    const deps = makeDeps(storage, { tools });
+    await drive(makeCtx(runId), deps);
+
+    const run = await storage.getRun(TENANT, runId);
+    expect(run?.status).toBe("completed");
+
+    const outputs = await storage.loadStepOutputs(TENANT, runId);
+    expect(outputs.get("fanout_node")).toEqual([
+      { combined: { aVal: 10, bVal: 100 } },
+      { combined: { aVal: 20, bVal: 200 } },
+    ]);
+  });
+
+  it("mid-fanout crash + redeliver re-runs only incomplete items (ledger-guarded, no double-fire)", async () => {
+    const storage = new MemoryStorage();
+
+    const manifest = makeManifest({
+      tools: [
+        {
+          toolId: "flaky",
+          name: "flaky",
+          description: "fails once for n=2",
+          kind: "local",
+          inputSchema: { type: "object", properties: {}, required: [] },
+          requiresApproval: false,
+          dangerous: false,
+        },
+      ],
+      nodes: [
+        {
+          nodeId: "fanout_node",
+          kind: "fanout",
+          elementSubgraph: ["sub_flaky"],
+          concurrency: 1, // sequential: makes the crash-then-redeliver window deterministic
+          outputSchema: [],
+        },
+        {
+          nodeId: "sub_flaky",
+          kind: "tool",
+          toolRef: "flaky",
+          requiresApproval: false,
+          params: {},
+          outputSchema: [],
+        },
+      ],
+      edges: [],
+      resume: { via: "api", holdsApproval: false },
+    });
+
+    const runId = "run_subgraph_crash" as RunId;
+    await bootstrapRun(storage, manifest, runId, { __items: [{ n: 1 }, { n: 2 }, { n: 3 }] });
+
+    const attemptsByN = new Map<number, number>();
+    const tools = new FakeToolsDispatcher();
+    tools.register("flaky", async (input) => {
+      const n = input["n"] as number;
+      const count = (attemptsByN.get(n) ?? 0) + 1;
+      attemptsByN.set(n, count);
+      if (n === 2 && count === 1) {
+        throw new Error("boom-mid-fanout");
+      }
+      return { doubled: n * 2 };
+    });
+
+    const deps = makeDeps(storage, { tools });
+
+    // First drive(): item n=1 completes, item n=2 crashes mid-dispatch (uncaught).
+    await expect(drive(makeCtx(runId), deps)).rejects.toThrow(/boom-mid-fanout/);
+
+    expect(attemptsByN.get(1)).toBe(1);
+    expect(attemptsByN.get(2)).toBe(1); // failed attempt — no ledger row
+    expect(attemptsByN.get(3)).toBeUndefined(); // never reached (sequential, concurrency=1)
+
+    const ledgerItem0 = await storage.hasSideEffect(TENANT, runId, "fanout_node#0#sub_flaky");
+    expect(ledgerItem0).not.toBeNull();
+    const ledgerItem1 = await storage.hasSideEffect(TENANT, runId, "fanout_node#1#sub_flaky");
+    expect(ledgerItem1).toBeNull(); // crashed before commit
+
+    // Redeliver: the run is not terminal, so a second drive() picks up where it left off.
+    await drive(makeCtx(runId), deps);
+
+    const run = await storage.getRun(TENANT, runId);
+    expect(run?.status).toBe("completed");
+
+    // Item n=1 (already completed) must NOT have been re-dispatched.
+    expect(attemptsByN.get(1)).toBe(1);
+    // Item n=2 retried exactly once more (its earlier attempt was never ledgered).
+    expect(attemptsByN.get(2)).toBe(2);
+    // Item n=3 ran exactly once (only in the second pass).
+    expect(attemptsByN.get(3)).toBe(1);
+
+    const outputs = await storage.loadStepOutputs(TENANT, runId);
+    expect(outputs.get("fanout_node")).toEqual([
+      { doubled: 2 },
+      { doubled: 4 },
+      { doubled: 6 },
+    ]);
+  });
+
+  it("approval-gated sub-tool holds the run; resume completes WITHOUT re-executing prior items or prior sub-nodes", async () => {
+    const storage = new MemoryStorage();
+
+    const manifest = makeManifest({
+      tools: [
+        {
+          toolId: "prep",
+          name: "prep",
+          description: "pure prep step",
+          kind: "local",
+          inputSchema: { type: "object", properties: {}, required: [] },
+          requiresApproval: false,
+          dangerous: false,
+        },
+        {
+          toolId: "escalate_sub",
+          name: "escalate_sub",
+          description: "needs approval",
+          kind: "local",
+          inputSchema: { type: "object", properties: {}, required: [] },
+          requiresApproval: true,
+          dangerous: true,
+        },
+      ],
+      nodes: [
+        {
+          nodeId: "fanout_node",
+          kind: "fanout",
+          elementSubgraph: ["sub_a", "sub_gate"],
+          concurrency: 1, // sequential: deterministic hold-on-first-incomplete-item
+          outputSchema: [],
+        },
+        {
+          nodeId: "sub_a",
+          kind: "tool",
+          toolRef: "prep",
+          requiresApproval: false,
+          params: {},
+          outputSchema: [],
+        },
+        {
+          nodeId: "sub_gate",
+          kind: "tool",
+          toolRef: "escalate_sub",
+          requiresApproval: true,
+          params: {},
+          outputSchema: [],
+        },
+      ],
+      edges: [{ edgeId: "e_sub", source: "sub_a", target: "sub_gate" }],
+      resume: { via: "api", holdsApproval: true },
+    });
+
+    const runId = "run_subgraph_approval" as RunId;
+    await bootstrapRun(storage, manifest, runId, { __items: [{ id: 1 }, { id: 2 }] });
+
+    const tools = new FakeToolsDispatcher();
+    tools.register("prep", async (input) => ({ id: input["id"], prepped: true }));
+    tools.register("escalate_sub", async (input) => ({ id: input["id"], escalated: true }));
+
+    // Pre-grant approval for item idx=0's gated sub-node, so it completes in pass 1
+    // and item idx=1 is the one that holds.
+    await storage.createPendingApproval({
+      runId,
+      stepId: "fanout_node#0#sub_gate",
+      actionId: "action_preapproved_0",
+      nodeId: "fanout_node#0#sub_gate",
+      toolName: "escalate_sub",
+      paramsJson: "{}",
+      status: "pending",
+      idempotencyKey: `${runId}#FANOUT#fanout_node#0#sub_gate`,
+    });
+    await storage.resolveApproval("action_preapproved_0", "approved");
+
+    const deps = makeDeps(storage, { tools });
+
+    // Pass 1: item idx=0 completes fully (pre-approved); item idx=1 holds at sub_gate.
+    await drive(makeCtx(runId), deps);
+    expect((await storage.getRun(TENANT, runId))?.status).toBe("awaiting_approval");
+    expect(tools.getCallCount("prep")).toBe(2); // both items' sub_a ran
+    expect(tools.getCallCount("escalate_sub")).toBe(1); // only item idx=0
+
+    const ledgerItem0Gate = await storage.hasSideEffect(TENANT, runId, "fanout_node#0#sub_gate");
+    expect(ledgerItem0Gate).not.toBeNull();
+    const ledgerItem1Gate = await storage.hasSideEffect(TENANT, runId, "fanout_node#1#sub_gate");
+    expect(ledgerItem1Gate).toBeNull();
+
+    // Resolve the held item's approval and resume (mirrors LocalRuntime.resumeRun).
+    const approvalRow = [...storage.getApprovals().values()].find(
+      (r) => r.nodeId === "fanout_node#1#sub_gate",
+    );
+    expect(approvalRow).toBeDefined();
+    await storage.resolveApproval(approvalRow!.actionId, "approved");
+    await storage.setRunStatus(TENANT, runId, "running", {});
+
+    // Pass 2: must complete WITHOUT re-executing item idx=0 (either sub-node) or
+    // re-executing item idx=1's already-ledgered sub_a.
+    await drive(makeCtx(runId), deps);
+
+    const finalRun = await storage.getRun(TENANT, runId);
+    expect(finalRun?.status).toBe("completed");
+    expect(tools.getCallCount("prep")).toBe(2); // unchanged — no re-run for either item
+    expect(tools.getCallCount("escalate_sub")).toBe(2); // +1 for item idx=1 only
+
+    const outputs = await storage.loadStepOutputs(TENANT, runId);
+    expect(outputs.get("fanout_node")).toEqual([
+      { id: 1, escalated: true },
+      { id: 2, escalated: true },
+    ]);
+  });
+
+  it("MAJOR 2: concurrency=2 fanout with BOTH items held simultaneously — approving ONE does not duplicate the other's approval row, and the still-held item keeps its ORIGINAL actionId", async () => {
+    const storage = new MemoryStorage();
+
+    const manifest = makeManifest({
+      tools: [
+        {
+          toolId: "escalate_sub",
+          name: "escalate_sub",
+          description: "needs approval",
+          kind: "local",
+          inputSchema: { type: "object", properties: {}, required: [] },
+          requiresApproval: true,
+          dangerous: true,
+        },
+      ],
+      nodes: [
+        {
+          nodeId: "fanout_node",
+          kind: "fanout",
+          elementSubgraph: ["sub_gate"],
+          concurrency: 2, // BOTH items dispatched in the SAME Promise.all batch
+          outputSchema: [],
+        },
+        {
+          nodeId: "sub_gate",
+          kind: "tool",
+          toolRef: "escalate_sub",
+          requiresApproval: true,
+          params: {},
+          outputSchema: [],
+        },
+      ],
+      edges: [],
+      resume: { via: "api", holdsApproval: true },
+    });
+
+    const runId = "run_fanout_concurrent_hold" as RunId;
+    await bootstrapRun(storage, manifest, runId, { __items: [{ id: 1 }, { id: 2 }] });
+
+    const tools = new FakeToolsDispatcher();
+    tools.register("escalate_sub", async (input) => ({ id: input["id"], escalated: true }));
+
+    const deps = makeDeps(storage, { tools });
+
+    // Pass 1: neither item is approved yet — BOTH hold in the same batch.
+    await drive(makeCtx(runId), deps);
+    expect((await storage.getRun(TENANT, runId))?.status).toBe("awaiting_approval");
+    expect(tools.getCallCount("escalate_sub")).toBe(0);
+
+    // Two DISTINCT pending approval rows — one per item — no duplicates yet.
+    const rowsAfterPass1 = [...storage.getApprovals().values()];
+    expect(rowsAfterPass1.length).toBe(2);
+    const item0RowsPass1 = rowsAfterPass1.filter((r) => r.nodeId === "fanout_node#0#sub_gate");
+    const item1RowsPass1 = rowsAfterPass1.filter((r) => r.nodeId === "fanout_node#1#sub_gate");
+    expect(item0RowsPass1.length).toBe(1);
+    expect(item1RowsPass1.length).toBe(1);
+    const item0OriginalActionId = item0RowsPass1[0]!.actionId;
+    const item1OriginalActionId = item1RowsPass1[0]!.actionId;
+
+    // Approve ONLY item 0, then resume.
+    await storage.resolveApproval(item0OriginalActionId, "approved");
+    await storage.setRunStatus(TENANT, runId, "running", {});
+
+    // Pass 2: item 0 completes; item 1 re-attempts the SAME still-pending hold.
+    // BEFORE the MAJOR 2 fix, this would call approvals.hold() again for item 1,
+    // minting a SECOND pending row with a NEW actionId — a duplicate.
+    await drive(makeCtx(runId), deps);
+
+    const runAfterPass2 = await storage.getRun(TENANT, runId);
+    expect(runAfterPass2?.status).toBe("awaiting_approval"); // item 1 still held
+    expect(tools.getCallCount("escalate_sub")).toBe(1); // only item 0 ran
+
+    const rowsAfterPass2 = [...storage.getApprovals().values()];
+    // Still exactly 2 rows total — NO duplicate row was created for item 1.
+    expect(rowsAfterPass2.length).toBe(2);
+    const item1RowsPass2 = rowsAfterPass2.filter((r) => r.nodeId === "fanout_node#1#sub_gate");
+    expect(item1RowsPass2.length).toBe(1);
+    // Item 1's actionId is UNCHANGED across the redrive.
+    expect(item1RowsPass2[0]!.actionId).toBe(item1OriginalActionId);
+    expect(item1RowsPass2[0]!.status).toBe("pending");
+
+    // The step checkpoint's heldApprovalId (what a UI/API would actually
+    // surface to the user for resolution) must reference this SAME original
+    // actionId — NOT a fresh "dangling" one that was never stored (the
+    // storage-layer dedup can silently mask a duplicate row while still
+    // returning/checkpointing a dangling actionId to the caller).
+    const item1StepCheckpoint = runAfterPass2?.steps.find(
+      (s) => String(s.stepId) === "fanout_node#1#sub_gate",
+    );
+    expect(item1StepCheckpoint?.heldApprovalId).toBe(item1OriginalActionId);
+
+    // Now approve item 1 using its ORIGINAL actionId and resume to completion.
+    await storage.resolveApproval(item1OriginalActionId, "approved");
+    await storage.setRunStatus(TENANT, runId, "running", {});
+    await drive(makeCtx(runId), deps);
+
+    const finalRun = await storage.getRun(TENANT, runId);
+    expect(finalRun?.status).toBe("completed");
+    expect(tools.getCallCount("escalate_sub")).toBe(2);
+
+    const outputs = await storage.loadStepOutputs(TENANT, runId);
+    expect(outputs.get("fanout_node")).toEqual([
+      { id: 1, escalated: true },
+      { id: 2, escalated: true },
+    ]);
+
+    // Still exactly 2 approval rows in total across the whole run — no dupes ever.
+    expect([...storage.getApprovals().values()].length).toBe(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // 12. Empty workflow (no nodes)
 // ---------------------------------------------------------------------------
 

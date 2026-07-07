@@ -133,6 +133,31 @@ function upstreamNodes(manifest: Manifest, nodeId: string): string[] {
 }
 
 /**
+ * Merge one or more upstream node outputs into a single input record.
+ * - zero upstreams: caller-supplied fallback (e.g. trigger input, or a fanout item)
+ * - single upstream: output of that node
+ * - multiple upstreams (merge): shallow merge of all upstream outputs
+ *
+ * Shared by resolveInput (top-level graph) and resolveSubgraphInput (fanout
+ * elementSubgraph) so the merge semantics can never drift between the two.
+ */
+function mergeUpstreamOutputs(
+  ups: readonly string[],
+  outputs: Map<string, unknown>,
+): Record<string, unknown> {
+  if (ups.length === 0) return {};
+  if (ups.length === 1) {
+    return (outputs.get(ups[0]!) as Record<string, unknown>) ?? {};
+  }
+  let merged: Record<string, unknown> = {};
+  for (const up of ups) {
+    const o = (outputs.get(up) as Record<string, unknown>) ?? {};
+    merged = { ...merged, ...o };
+  }
+  return merged;
+}
+
+/**
  * Resolve the input for a node from accumulated outputs.
  * - first node (no upstreams): uses trigger input stored in outputs.get("__trigger__")
  * - single upstream: output of that node
@@ -148,17 +173,78 @@ function resolveInput(
     const trigger = outputs.get("__trigger__");
     return (trigger as Record<string, unknown>) ?? {};
   }
-  if (ups.length === 1) {
-    const up = ups[0]!;
-    return (outputs.get(up) as Record<string, unknown>) ?? {};
+  return mergeUpstreamOutputs(ups, outputs);
+}
+
+/**
+ * Topologically sort a fanout's elementSubgraph member ids using ONLY the
+ * subgraph-internal edges (both endpoints inside `ids`). Ties (and the
+ * initial root set) are broken by the recorded order of `ids` (stable Kahn's
+ * algorithm), since the compiler emits elementSubgraph in recorded (already
+ * topological) order — this is a defensive re-derivation, not a requirement.
+ * If a cycle is detected (should never happen for a compiler-emitted
+ * subgraph), unreached ids are appended in original order as a best effort.
+ */
+function topoSortSubgraph(
+  ids: readonly string[],
+  edges: readonly { source: string; target: string }[],
+): string[] {
+  const idSet = new Set(ids);
+  const adjacency = new Map<string, string[]>();
+  const inDegree = new Map<string, number>();
+  for (const id of ids) {
+    adjacency.set(id, []);
+    inDegree.set(id, 0);
   }
-  // merge: shallow merge of all upstream outputs
-  let merged: Record<string, unknown> = {};
-  for (const up of ups) {
-    const o = (outputs.get(up) as Record<string, unknown>) ?? {};
-    merged = { ...merged, ...o };
+  for (const e of edges) {
+    if (!idSet.has(e.source) || !idSet.has(e.target)) continue;
+    adjacency.get(e.source)!.push(e.target);
+    inDegree.set(e.target, (inDegree.get(e.target) ?? 0) + 1);
   }
-  return merged;
+
+  const queue: string[] = ids.filter((id) => (inDegree.get(id) ?? 0) === 0);
+  const sorted: string[] = [];
+  const remaining = new Map(inDegree);
+
+  while (queue.length > 0) {
+    const id = queue.shift()!;
+    sorted.push(id);
+    for (const next of adjacency.get(id) ?? []) {
+      const d = (remaining.get(next) ?? 0) - 1;
+      remaining.set(next, d);
+      if (d === 0) queue.push(next);
+    }
+  }
+
+  if (sorted.length !== ids.length) {
+    // Cycle — best-effort: append whatever wasn't reached, in original order.
+    for (const id of ids) {
+      if (!sorted.includes(id)) sorted.push(id);
+    }
+  }
+  return sorted;
+}
+
+/**
+ * Resolve the per-item input for a subgraph member node.
+ * Every "root" (a member with no in-subgraph upstream edge) receives the raw
+ * fanout item — SHOULD-FIX 5: a subgraph can have MULTIPLE roots (e.g. two
+ * independent chains off the raw item, later combined via b.merge(...)); all
+ * of them must get the item, not just one. All non-root members merge their
+ * in-subgraph upstream outputs, as before.
+ */
+function resolveSubgraphInput(
+  nodeId: string,
+  entryIds: ReadonlySet<string>,
+  item: unknown,
+  subEdges: readonly { source: string; target: string }[],
+  itemOutputs: Map<string, unknown>,
+): Record<string, unknown> {
+  if (entryIds.has(nodeId)) {
+    return (item as Record<string, unknown>) ?? {};
+  }
+  const ups = subEdges.filter((e) => e.target === nodeId).map((e) => e.source);
+  return mergeUpstreamOutputs(ups, itemOutputs);
 }
 
 /**
@@ -215,6 +301,228 @@ type StepResult =
   | { kind: "held"; nodeId: string; approvalId: string }
   | { kind: "failed"; nodeId: string; error: string };
 
+/** Result of executing a single transform or subgraph-member node (no nodeId — caller attaches it). */
+type NodeStepResult =
+  | { kind: "done"; output: unknown }
+  | { kind: "failed"; error: string };
+
+/** Result of executing a single subgraph-member node inside a fanout item (adds "held" for approval gating). */
+type SubNodeResult = NodeStepResult | { kind: "held"; approvalId: string };
+
+// ---------------------------------------------------------------------------
+// runTransformNode — shared transform logic (map/filter/split/http_request).
+// Extracted so it can run both at the top level (stepId = node.nodeId) and
+// inside a fanout elementSubgraph (stepId = "<fanoutNodeId>#<idx>#<subNodeId>").
+// ---------------------------------------------------------------------------
+
+async function runTransformNode(
+  t: Extract<Manifest["nodes"][number], { kind: "transform" }>["transform"],
+  input: Record<string, unknown>,
+  stepId: string,
+  idemKey: string,
+  ctx: ExecutorContext,
+  storage: Storage,
+  checkpoint: (r: StepCheckpoint) => void,
+): Promise<NodeStepResult> {
+  let out: unknown;
+
+  if (t.type === "map") {
+    const mapped: Record<string, unknown> = {};
+    for (const m of t.mappings) {
+      // Simple dot-path resolution for 'from' key
+      const val = resolvePath(input, m.from);
+      setPath(mapped, m.to, val);
+    }
+    out = mapped;
+  } else if (t.type === "filter") {
+    // Returns the input if passes, else undefined (node skipped)
+    const val = resolvePath(input, t.field);
+    const valStr = val === undefined || val === null ? "" : String(val);
+    const passes = evalFilterOp(t.operator, valStr, t.value);
+    out = passes ? input : undefined;
+  } else if (t.type === "split") {
+    // Split: returns the array field value as-is for fanout.
+    // b.split()'s TS signature only accepts an ALREADY-array-typed upstream
+    // handle (Up extends readonly unknown[]) — the compiler never has a field
+    // NAME to record (arrayField is compiled as "" — see compile.ts), because
+    // there is no field to extract: the upstream's entire output IS the
+    // array. An empty arrayField therefore means "identity" (pass the input
+    // through as-is), not "look up the '' property".
+    out = t.arrayField === "" ? input : resolvePath(input, t.arrayField);
+  } else if (t.type === "http_request") {
+    // HOLE C2 FIX: http_request transforms issue a real fetch (external side effect).
+    // Unlike map/filter/split (pure), a redelivery after crash-before-drain would
+    // re-run the fetch (probe reproduced fires=2). Route http_request through the
+    // SAME hasSideEffect pre-check + commitStepWithSideEffect atomic co-write that
+    // tool nodes use, so http_request is exactly-once at the step boundary.
+    const priorHttp = await storage.hasSideEffect(ctx.tenantId, ctx.runId, stepId);
+    if (priorHttp) {
+      // Already executed — return the ledgered result without re-fetching
+      return { kind: "done", output: priorHttp.result };
+    }
+    try {
+      const body = t.bodyTemplate
+        ? interpolateTemplate(t.bodyTemplate, input)
+        : undefined;
+      const fetchInit: RequestInit = {
+        method: t.method,
+        headers: t.headers ?? {},
+      };
+      if (body !== undefined) {
+        fetchInit.body = body;
+      }
+      // SECURITY FIX (HIGH 3): use ssrfSafeFetch instead of raw fetch.
+      // Raw fetch allows requests to 169.254.169.254 (IMDS), RFC1918 addresses,
+      // and follows redirects, enabling SSRF attacks that could steal AWS credentials.
+      const resp = await ssrfSafeFetch(t.url, fetchInit);
+      out = await resp.json() as unknown;
+    } catch (err) {
+      return {
+        kind: "failed",
+        error: `http_request failed: ${err instanceof Error ? err.message : String(err)}`,
+      };
+    }
+    // Atomic step-completed + SIDEEFFECT# co-write (same contract as tool nodes)
+    const httpStepRecord: StepCheckpoint = {
+      tenantId: ctx.tenantId,
+      runId: ctx.runId,
+      stepId,
+      status: "completed",
+      input,
+      output: out,
+    };
+    const httpLedger: SideEffectRow = {
+      tenantId: ctx.tenantId,
+      runId: ctx.runId,
+      nodeId: stepId,
+      idempotencyKey: idemKey,
+      toolName: `http_request:${t.method}:${t.url}`,
+      result: out,
+    };
+    await storage.commitStepWithSideEffect(httpStepRecord, httpLedger);
+    return { kind: "done", output: out };
+  } else {
+    out = input;
+  }
+
+  checkpoint({
+    tenantId: ctx.tenantId,
+    runId: ctx.runId,
+    stepId,
+    status: "completed",
+    input,
+    output: out,
+  });
+  return { kind: "done", output: out };
+}
+
+// ---------------------------------------------------------------------------
+// runSubNode — executes ONE member of a fanout's elementSubgraph, for ONE item.
+//
+// Mirrors runStep's tool-node contract (approval hold → SIDEEFFECT# pre-check →
+// dispatch → atomic commitStepWithSideEffect), but scoped per-item:
+//   - checkpoint/approval stepId  = "<fanoutNodeId>#<idx>#<subNodeId>"
+//   - tool dispatch idempotencyKey = "<runId>#FANOUT#<fanoutNodeId>#<idx>#<subNodeId>"
+// This keeps sub-tool side effects exactly-once via the SAME ledger contract
+// used by top-level tool nodes (v1 scope — see file header).
+// ---------------------------------------------------------------------------
+
+async function runSubNode(
+  subNode: Manifest["nodes"][number],
+  subInput: Record<string, unknown>,
+  fanoutNodeId: string,
+  idx: number,
+  manifest: Manifest,
+  ctx: ExecutorContext,
+  deps: ExecutorDeps,
+  checkpoint: (r: StepCheckpoint) => void,
+): Promise<SubNodeResult> {
+  const { storage, tools, approvals } = deps;
+  const subStepId = `${fanoutNodeId}#${idx}#${subNode.nodeId}`;
+  const idemKey = `${ctx.runId}#FANOUT#${fanoutNodeId}#${idx}#${subNode.nodeId}`;
+
+  if (subNode.kind === "tool") {
+    if (effectiveApproval(subNode, manifest)) {
+      const existingApproval = await storage.getApprovalByStep(ctx.tenantId, ctx.runId, subStepId);
+      // MAJOR 2 fix: a PENDING row already exists for this step (e.g. a
+      // fanout sibling item was approved and this drive() pass re-attempts
+      // ALL still-unresolved batch members) — return the EXISTING actionId
+      // instead of holding again. Holding again would create a second
+      // approval row for the same step, and DynamoStorage.getApprovalByStep
+      // ordering across duplicate rows is nondeterministic (see
+      // storage-dynamo.ts's getApprovalByStep), letting an approved item
+      // get re-held indefinitely.
+      if (existingApproval?.status === "pending") {
+        return { kind: "held", approvalId: existingApproval.actionId };
+      }
+      if (existingApproval?.status !== "approved") {
+        const paramsJson = JSON.stringify(subInput);
+        const actionId = await approvals.hold({
+          runId: ctx.runId,
+          tenantId: ctx.tenantId,
+          nodeId: subStepId,
+          toolName: subNode.toolRef,
+          paramsJson,
+          idempotencyKey: idemKey,
+        });
+        checkpoint({
+          tenantId: ctx.tenantId,
+          runId: ctx.runId,
+          stepId: subStepId,
+          status: "awaiting_approval",
+          input: subInput,
+          heldApprovalId: actionId,
+          idempotencyKey: idemKey,
+        });
+        return { kind: "held", approvalId: actionId };
+      }
+      // Approval already granted — fall through to side-effect pre-check + dispatch
+    }
+
+    const prior = await storage.hasSideEffect(ctx.tenantId, ctx.runId, subStepId);
+    if (prior) {
+      // Already executed — return the ledgered result without re-running
+      return { kind: "done", output: prior.result };
+    }
+
+    const out = await tools.execute(subNode.toolRef, subInput, {
+      idempotencyKey: idemKey,
+      tenantId: ctx.tenantId,
+    });
+
+    const stepRecord: StepCheckpoint = {
+      tenantId: ctx.tenantId,
+      runId: ctx.runId,
+      stepId: subStepId,
+      status: "completed",
+      input: subInput,
+      output: out,
+      idempotencyKey: idemKey,
+    };
+    const ledger: SideEffectRow = {
+      tenantId: ctx.tenantId,
+      runId: ctx.runId,
+      nodeId: subStepId,
+      idempotencyKey: idemKey,
+      toolName: subNode.toolRef,
+      result: out,
+    };
+    await storage.commitStepWithSideEffect(stepRecord, ledger);
+    return { kind: "done", output: out };
+  }
+
+  if (subNode.kind === "transform") {
+    return runTransformNode(subNode.transform, subInput, subStepId, idemKey, ctx, storage, checkpoint);
+  }
+
+  // v1 scope: agent / merge / nested-fanout members inside an elementSubgraph
+  // are not supported yet (see file header — mirrors other documented v1 limits).
+  return {
+    kind: "failed",
+    error: `Unsupported subgraph node kind: ${subNode.kind} (v1 limitation)`,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // runStep — executes a single node
 // ---------------------------------------------------------------------------
@@ -240,6 +548,11 @@ async function runStep(
     // (plan §588: approval granted → resume → tool runs → completes).
     if (effectiveApproval(node, manifest)) {
       const existingApproval = await storage.getApprovalByStep(ctx.tenantId, ctx.runId, node.nodeId);
+      // MAJOR 2 fix: see runSubNode's identical guard above — a still-PENDING
+      // row must return its EXISTING actionId, not hold again.
+      if (existingApproval?.status === "pending") {
+        return { kind: "held", nodeId: node.nodeId, approvalId: existingApproval.actionId };
+      }
       if (existingApproval?.status !== "approved") {
         // No granted approval — hold and wait
         const paramsJson = JSON.stringify(input);
@@ -387,6 +700,15 @@ async function runStep(
           // For agent-internal tool calls requiring approval, we surface as a held result
           // The whole agent node gets held; this is a simplification — v2 will checkpoint mid-loop
           const agentToolKey = `${ctx.runId}#${node.nodeId}#${call.name}`;
+          // MAJOR 2 fix: same guard as runStep/runSubNode — since sub-step
+          // checkpointing is v2 scope, the whole agent loop re-runs from
+          // iteration 1 on every redrive until the approval is resolved, so
+          // without this check every redrive would hold() again and create a
+          // new duplicate approval row for node.nodeId.
+          const existingApproval = await storage.getApprovalByStep(ctx.tenantId, ctx.runId, node.nodeId);
+          if (existingApproval?.status === "pending") {
+            return { kind: "held", nodeId: node.nodeId, approvalId: existingApproval.actionId };
+          }
           const actionId = await approvals.hold({
             runId: ctx.runId,
             tenantId: ctx.tenantId,
@@ -491,92 +813,19 @@ async function runStep(
 
   // ── transform node ─────────────────────────────────────────────────────────
   if (node.kind === "transform") {
-    const t = node.transform;
-    let out: unknown;
-
-    if (t.type === "map") {
-      const mapped: Record<string, unknown> = {};
-      for (const m of t.mappings) {
-        // Simple dot-path resolution for 'from' key
-        const val = resolvePath(input, m.from);
-        setPath(mapped, m.to, val);
-      }
-      out = mapped;
-    } else if (t.type === "filter") {
-      // Returns the input if passes, else undefined (node skipped)
-      const val = resolvePath(input, t.field);
-      const valStr = val === undefined || val === null ? "" : String(val);
-      const passes = evalFilterOp(t.operator, valStr, t.value);
-      out = passes ? input : undefined;
-    } else if (t.type === "split") {
-      // Split: returns the array field value as-is for fanout
-      out = resolvePath(input, t.arrayField);
-    } else if (t.type === "http_request") {
-      // HOLE C2 FIX: http_request transforms issue a real fetch (external side effect).
-      // Unlike map/filter/split (pure), a redelivery after crash-before-drain would
-      // re-run the fetch (probe reproduced fires=2). Route http_request through the
-      // SAME hasSideEffect pre-check + commitStepWithSideEffect atomic co-write that
-      // tool nodes use, so http_request is exactly-once at the step boundary.
-      const priorHttp = await storage.hasSideEffect(ctx.tenantId, ctx.runId, node.nodeId);
-      if (priorHttp) {
-        // Already executed — return the ledgered result without re-fetching
-        return { kind: "done", nodeId: node.nodeId, output: priorHttp.result };
-      }
-      try {
-        const body = t.bodyTemplate
-          ? interpolateTemplate(t.bodyTemplate, input)
-          : undefined;
-        const fetchInit: RequestInit = {
-          method: t.method,
-          headers: t.headers ?? {},
-        };
-        if (body !== undefined) {
-          fetchInit.body = body;
-        }
-        // SECURITY FIX (HIGH 3): use ssrfSafeFetch instead of raw fetch.
-        // Raw fetch allows requests to 169.254.169.254 (IMDS), RFC1918 addresses,
-        // and follows redirects, enabling SSRF attacks that could steal AWS credentials.
-        const resp = await ssrfSafeFetch(t.url, fetchInit);
-        out = await resp.json() as unknown;
-      } catch (err) {
-        return {
-          kind: "failed",
-          nodeId: node.nodeId,
-          error: `http_request failed: ${err instanceof Error ? err.message : String(err)}`,
-        };
-      }
-      // Atomic step-completed + SIDEEFFECT# co-write (same contract as tool nodes)
-      const httpStepRecord: StepCheckpoint = {
-        tenantId: ctx.tenantId,
-        runId: ctx.runId,
-        stepId: node.nodeId,
-        status: "completed",
-        input: input as Record<string, unknown>,
-        output: out,
-      };
-      const httpLedger: SideEffectRow = {
-        tenantId: ctx.tenantId,
-        runId: ctx.runId,
-        nodeId: node.nodeId,
-        idempotencyKey: idemKey,
-        toolName: `http_request:${t.method}:${t.url}`,
-        result: out,
-      };
-      await storage.commitStepWithSideEffect(httpStepRecord, httpLedger);
-      return { kind: "done", nodeId: node.nodeId, output: out };
-    } else {
-      out = input;
+    const result = await runTransformNode(
+      node.transform,
+      input as Record<string, unknown>,
+      node.nodeId,
+      idemKey,
+      ctx,
+      storage,
+      checkpoint,
+    );
+    if (result.kind === "failed") {
+      return { kind: "failed", nodeId: node.nodeId, error: result.error };
     }
-
-    checkpoint({
-      tenantId: ctx.tenantId,
-      runId: ctx.runId,
-      stepId: node.nodeId,
-      status: "completed",
-      input: input as Record<string, unknown>,
-      output: out,
-    });
-    return { kind: "done", nodeId: node.nodeId, output: out };
+    return { kind: "done", nodeId: node.nodeId, output: result.output };
   }
 
   // ── fanout node ─────────────────────────────────────────────────────────────
@@ -584,18 +833,109 @@ async function runStep(
     // The upstream split transform should have produced an array
     const items = (input as { __items?: unknown[] }).__items ?? (Array.isArray(input) ? input : []);
     const concurrency = node.concurrency;
+    const elementSubgraph = node.elementSubgraph;
 
-    // Run items in bounded concurrency batches, with per-item checkpoints (resumable)
+    if (elementSubgraph.length === 0) {
+      // EMPTY SUBGRAPH REMAINS PASSTHROUGH (locked behavior — existing hand-built
+      // manifests with elementSubgraph: [] must keep this exact contract).
+      const results: unknown[] = new Array(items.length) as unknown[];
+      let i = 0;
+
+      while (i < items.length) {
+        const batch = items.slice(i, i + concurrency);
+        const batchResults = await Promise.all(
+          batch.map(async (item, batchIdx) => {
+            const idx = i + batchIdx;
+            const fanoutKey = `FANOUT#${node.nodeId}#${idx}`;
+            // Per-item checkpoint
+            checkpoint({
+              tenantId: ctx.tenantId,
+              runId: ctx.runId,
+              stepId: fanoutKey,
+              status: "running",
+              input: { item, index: idx },
+            });
+            // Passthrough: no elementSubgraph to run.
+            const itemOut = item;
+            checkpoint({
+              tenantId: ctx.tenantId,
+              runId: ctx.runId,
+              stepId: fanoutKey,
+              status: "completed",
+              output: itemOut,
+            });
+            return { idx, output: itemOut };
+          }),
+        );
+        for (const r of batchResults) {
+          results[r.idx] = r.output;
+        }
+        i += concurrency;
+      }
+
+      checkpoint({
+        tenantId: ctx.tenantId,
+        runId: ctx.runId,
+        stepId: node.nodeId,
+        status: "completed",
+        output: results,
+      });
+
+      return { kind: "done", nodeId: node.nodeId, output: results, fanoutHandled: [] };
+    }
+
+    // Non-empty elementSubgraph: run each item through the REAL subgraph.
+    const subOrder = topoSortSubgraph(elementSubgraph, manifest.edges);
+    const subMembers = new Map(
+      manifest.nodes
+        .filter((n) => elementSubgraph.includes(n.nodeId))
+        .map((n) => [n.nodeId, n] as const),
+    );
+    const subEdges = manifest.edges.filter(
+      (e) => elementSubgraph.includes(e.source) && elementSubgraph.includes(e.target),
+    );
+    // SHOULD-FIX 5: EVERY zero-in-degree member ("root") gets the raw
+    // fanout item as its input, not just the first one found. A fanout body
+    // can legitimately record multiple parallel chains straight off the item
+    // (e.g. two independent b.node(tool, item, ...) calls later combined via
+    // b.merge(...)) — before this fix, only ONE root received the item and
+    // every OTHER root silently resolved its input to `{}` (resolveSubgraphInput
+    // found no in-subgraph upstream edges for it and merged zero outputs).
+    const entryIds = new Set<string>(
+      subOrder.filter((id) => !subEdges.some((e) => e.target === id)),
+    );
+    if (entryIds.size === 0 && subOrder[0] !== undefined) {
+      // Defensive fallback (should never happen for a compiler-emitted,
+      // cycle-free elementSubgraph — topoSortSubgraph always yields at least
+      // one zero-in-degree id as subOrder[0]).
+      entryIds.add(subOrder[0]);
+    }
+    // SHOULD-FIX 4: collect the body's ACTUALLY-RETURNED handle's output
+    // (manifest.terminalSubNodeId — see define-workflow.ts::fanout()), NOT
+    // just "whichever member sorts last in topo order". A fanout body can
+    // record additional nodes (e.g. an audit node) AFTER the handle it
+    // returns — falling back to last-topo-order would silently collect that
+    // audit node's output instead. Falls back to last-topo-order for
+    // manifests compiled before this field existed (backward compatible).
+    const terminalId = node.terminalSubNodeId ?? subOrder[subOrder.length - 1]!;
+
     const results: unknown[] = new Array(items.length) as unknown[];
+    let held: { approvalId: string } | null = null;
+    let failure: { error: string } | null = null;
     let i = 0;
 
-    while (i < items.length) {
+    itemLoop: while (i < items.length) {
       const batch = items.slice(i, i + concurrency);
       const batchResults = await Promise.all(
         batch.map(async (item, batchIdx) => {
           const idx = i + batchIdx;
           const fanoutKey = `FANOUT#${node.nodeId}#${idx}`;
-          // Per-item checkpoint
+
+          // Already completed (from a prior drive() pass) — reuse, no re-run.
+          if (outputs.has(fanoutKey)) {
+            return { idx, kind: "done" as const, output: outputs.get(fanoutKey) };
+          }
+
           checkpoint({
             tenantId: ctx.tenantId,
             runId: ctx.runId,
@@ -603,22 +943,56 @@ async function runStep(
             status: "running",
             input: { item, index: idx },
           });
-          // Process through elementSubgraph (simplified: pass item through)
-          const itemOut = item;
+
+          const itemOutputs = new Map<string, unknown>();
+          let lastOutput: unknown = item;
+
+          for (const subId of subOrder) {
+            const subNode = subMembers.get(subId)!;
+            const subInput = resolveSubgraphInput(subId, entryIds, item, subEdges, itemOutputs);
+            const subResult = await runSubNode(subNode, subInput, node.nodeId, idx, manifest, ctx, deps, checkpoint);
+
+            if (subResult.kind === "held") {
+              return { idx, kind: "held" as const, approvalId: subResult.approvalId };
+            }
+            if (subResult.kind === "failed") {
+              return { idx, kind: "failed" as const, error: subResult.error };
+            }
+
+            itemOutputs.set(subId, subResult.output);
+            if (subId === terminalId) lastOutput = subResult.output;
+          }
+
           checkpoint({
             tenantId: ctx.tenantId,
             runId: ctx.runId,
             stepId: fanoutKey,
             status: "completed",
-            output: itemOut,
+            output: lastOutput,
           });
-          return { idx, output: itemOut };
+          return { idx, kind: "done" as const, output: lastOutput };
         }),
       );
+
       for (const r of batchResults) {
+        if (r.kind === "held") {
+          held = { approvalId: r.approvalId };
+          break itemLoop;
+        }
+        if (r.kind === "failed") {
+          failure = { error: r.error };
+          break itemLoop;
+        }
         results[r.idx] = r.output;
       }
       i += concurrency;
+    }
+
+    if (held) {
+      return { kind: "held", nodeId: node.nodeId, approvalId: held.approvalId };
+    }
+    if (failure) {
+      return { kind: "failed", nodeId: node.nodeId, error: failure.error };
     }
 
     checkpoint({
@@ -740,12 +1114,25 @@ export async function drive(ctx: ExecutorContext, deps: ExecutorDeps): Promise<v
   // Rehydrate step outputs from storage (never a single previousOutput)
   const outputs = await storage.loadStepOutputs(ctx.tenantId, ctx.runId);
 
-  // Compute which nodes are already done (only manifest nodes, not __trigger__ or FANOUT# etc.)
-  const manifestNodeIds = new Set(manifest.nodes.map((n) => n.nodeId));
+  // subgraphMembers = union of all fanout nodes' elementSubgraph. These nodes
+  // are emitted into manifest.nodes (so they're addressable/validated), but
+  // they must NOT be scheduled independently at the top level — they only run
+  // per-item, INSIDE their owning fanout node's runStep (see runSubNode).
+  const subgraphMembers = new Set<string>();
+  for (const n of manifest.nodes) {
+    if (n.kind === "fanout") {
+      for (const id of n.elementSubgraph) subgraphMembers.add(id);
+    }
+  }
+  const topLevelNodes = manifest.nodes.filter((n) => !subgraphMembers.has(n.nodeId));
+
+  // Compute which nodes are already done (only TOP-LEVEL manifest nodes, not
+  // __trigger__, FANOUT# per-item checkpoints, or subgraph-member stepIds).
+  const topLevelNodeIds = new Set(topLevelNodes.map((n) => n.nodeId));
   const done = new Set<string>(
     run.steps
       .filter(
-        (s) => (s.status === "completed" || s.status === "skipped") && manifestNodeIds.has(String(s.stepId)),
+        (s) => (s.status === "completed" || s.status === "skipped") && topLevelNodeIds.has(String(s.stepId)),
       )
       .map((s) => String(s.stepId)),
   );
@@ -771,7 +1158,7 @@ export async function drive(ctx: ExecutorContext, deps: ExecutorDeps): Promise<v
   if (run.costUsd !== undefined) usageAcc.costUsd = run.costUsd;
 
   // Main scheduling loop
-  while (done.size < manifest.nodes.length) {
+  while (done.size < topLevelNodes.length) {
     // Soft time budget: drain + enqueue continuation
     if (Date.now() >= ctx.deadlineAt) {
       await flush.catch(() => { /* already logged */ });
@@ -804,8 +1191,9 @@ export async function drive(ctx: ExecutorContext, deps: ExecutorDeps): Promise<v
       return;
     }
 
-    // Find ready nodes: all upstreams done
-    const ready = manifest.nodes.filter(
+    // Find ready nodes: all upstreams done (subgraph members are excluded —
+    // they're not independently scheduled; see topLevelNodes above)
+    const ready = topLevelNodes.filter(
       (n) =>
         !done.has(n.nodeId) &&
         upstreamNodes(manifest, n.nodeId).every((u) => done.has(u)),
@@ -897,7 +1285,7 @@ export async function drive(ctx: ExecutorContext, deps: ExecutorDeps): Promise<v
 
   // Emit outputs to EventBus with chainDepth+1 (chainDepth guard: refuse past MAX_CHAIN_DEPTH)
   if (run.chainDepth < MAX_CHAIN_DEPTH) {
-    const finalOutput = outputs.get(manifest.nodes[manifest.nodes.length - 1]?.nodeId ?? "");
+    const finalOutput = outputs.get(topLevelNodes[topLevelNodes.length - 1]?.nodeId ?? "");
     if (finalOutput !== undefined) {
       const event: DrahtEvent = {
         eventType: `${manifest.agent.agentId}.completed`,

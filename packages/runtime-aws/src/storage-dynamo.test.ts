@@ -396,6 +396,70 @@ describe("DynamoStorage — mock assertions (always run)", () => {
 
     mock.restore();
   });
+
+  // MAJOR 2 (b): getApprovalByStep must be deterministic even when multiple
+  // rows exist for the same (runId, nodeId) — sk = APPROVAL#action_<uuid> is
+  // a random tiebreak, NOT creation order, so "last item returned by Query"
+  // is nondeterministic. Assert: a resolved (approved) row always wins over
+  // a pending duplicate, REGARDLESS of the order Query returns them in.
+  it("getApprovalByStep prefers an approved row over a pending duplicate, regardless of Query item order", async () => {
+    const mock = mockClient(DynamoDBDocumentClient);
+    const mockDoc = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+    const s = new DynamoStorage("test-table", mockDoc);
+
+    const pendingItem = {
+      pk: "RUN#run_x", sk: "APPROVAL#action_pending", _entity: "Approval",
+      actionId: "action_pending", runId: "run_x", stepId: "n", nodeId: "n",
+      toolName: "t", paramsJson: "{}", status: "pending",
+      idempotencyKey: "run_x#n", createdAt: "2026-01-01T00:00:00.000Z",
+    };
+    const approvedItem = {
+      pk: "RUN#run_x", sk: "APPROVAL#action_approved", _entity: "Approval",
+      actionId: "action_approved", runId: "run_x", stepId: "n", nodeId: "n",
+      toolName: "t", paramsJson: "{}", status: "approved",
+      idempotencyKey: "run_x#n", createdAt: "2025-12-31T00:00:00.000Z", // OLDER than the pending row
+    };
+
+    // Order A: pending first, approved last (what "pick last" used to assume).
+    mock.on(QueryCommand)
+      .resolvesOnce({ Items: [pendingItem, approvedItem] })
+      .resolvesOnce({ Items: [approvedItem, pendingItem] });
+    const foundA = await s.getApprovalByStep(TENANT, "run_x" as RunId, "n");
+    expect(foundA?.status).toBe("approved");
+    expect(foundA?.actionId).toBe("action_approved");
+
+    // Order B: approved first, pending last — must still pick "approved".
+    const foundB = await s.getApprovalByStep(TENANT, "run_x" as RunId, "n");
+    expect(foundB?.status).toBe("approved");
+    expect(foundB?.actionId).toBe("action_approved");
+
+    mock.restore();
+  });
+
+  it("getApprovalByStep tiebreaks two pending duplicates by newest createdAt", async () => {
+    const mock = mockClient(DynamoDBDocumentClient);
+    const mockDoc = DynamoDBDocumentClient.from(new DynamoDBClient({}));
+    const s = new DynamoStorage("test-table", mockDoc);
+
+    const older = {
+      pk: "RUN#run_y", sk: "APPROVAL#action_old", _entity: "Approval",
+      actionId: "action_old", runId: "run_y", stepId: "n", nodeId: "n",
+      toolName: "t", paramsJson: "{}", status: "pending",
+      idempotencyKey: "run_y#n", createdAt: "2026-01-01T00:00:00.000Z",
+    };
+    const newer = {
+      pk: "RUN#run_y", sk: "APPROVAL#action_new", _entity: "Approval",
+      actionId: "action_new", runId: "run_y", stepId: "n", nodeId: "n",
+      toolName: "t", paramsJson: "{}", status: "pending",
+      idempotencyKey: "run_y#n", createdAt: "2026-01-02T00:00:00.000Z",
+    };
+    mock.on(QueryCommand).resolves({ Items: [older, newer] });
+
+    const found = await s.getApprovalByStep(TENANT, "run_y" as RunId, "n");
+    expect(found?.actionId).toBe("action_new");
+
+    mock.restore();
+  });
 });
 
 // ---------------------------------------------------------------------------

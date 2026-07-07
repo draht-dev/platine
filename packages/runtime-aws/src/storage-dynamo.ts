@@ -113,6 +113,8 @@ interface ApprovalItem {
   status: string;
   idempotencyKey: string;
   decidedBy?: string;
+  /** Optional for backward-compatible reads of rows written before this field existed. */
+  createdAt?: string;
 }
 
 interface ManifestItem {
@@ -475,6 +477,7 @@ export class DynamoStorage implements Storage {
       paramsJson: a.paramsJson,
       status: a.status,
       idempotencyKey: a.idempotencyKey,
+      createdAt: a.createdAt ?? new Date().toISOString(),
     };
     if (a.decidedBy !== undefined) item.decidedBy = a.decidedBy;
     try {
@@ -543,9 +546,22 @@ export class DynamoStorage implements Storage {
       (item) => (item as ApprovalItem).nodeId === nodeId
     ) as ApprovalItem[];
     if (rows.length === 0) return null;
-    const last = rows[rows.length - 1];
-    if (last === undefined) return null;
-    return this.approvalToRecord(last);
+
+    // MAJOR 2 fix: `sk = APPROVAL#action_<uuid>` — Dynamo Query result order
+    // is by sort key, which is a random UUID, NOT creation order, so picking
+    // "the last row" was nondeterministic and could let a resolved row be
+    // shadowed by a pending duplicate (or vice versa). Deterministically
+    // prefer a resolved row (approved/rejected) over a pending one; tiebreak
+    // by the newest createdAt (rows written before this field existed sort
+    // as "" — oldest — which is a safe, backward-compatible default).
+    const rank = (s: string): number => (s === "pending" ? 0 : 1);
+    const winner = rows.reduce((best, row) => {
+      const bestRank = rank(best.status);
+      const rowRank = rank(row.status);
+      if (rowRank !== bestRank) return rowRank > bestRank ? row : best;
+      return (row.createdAt ?? "") > (best.createdAt ?? "") ? row : best;
+    });
+    return this.approvalToRecord(winner);
   }
 
   // ── Private helpers ────────────────────────────────────────────────────────
@@ -596,6 +612,7 @@ export class DynamoStorage implements Storage {
       status: row.status as "pending" | "approved" | "rejected",
       idempotencyKey: row.idempotencyKey,
       ...(row.decidedBy !== undefined ? { decidedBy: row.decidedBy } : {}),
+      ...(row.createdAt !== undefined ? { createdAt: row.createdAt } : {}),
     };
   }
 }
