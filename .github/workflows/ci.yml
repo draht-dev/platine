@@ -40,5 +40,19 @@ jobs:
       - name: Test
         run: pnpm test
 
+      # Root `pnpm test` only globs packages/*/src — the conformance package's
+      # offline unit tests (output parsing, teardown ordering, check registry)
+      # need their own invocation or they silently bit-rot.
+      - name: Conformance unit tests
+        run: pnpm -F @draht/conformance test
+
       - name: Build
         run: pnpm build
+
+      # Offline conformance smoke test — zero AWS, zero network. Exercises the
+      # same deploy → CHECKS (t3/t6-hold/t5-redeploy/t6-resume) → teardown
+      # sequence the real-aws.yml gate runs, against an in-memory simulation.
+      # Runs AFTER build: harness.ts imports @draht/runtime-aws + @draht/platine
+      # by their package.json "exports" (dist/*), which only exist post-build.
+      - name: Conformance dry-run
+        run: pnpm conformance:dry-run

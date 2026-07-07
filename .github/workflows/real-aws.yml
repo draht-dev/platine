@@ -1,29 +1,43 @@
 name: Real AWS Conformance
 
-# STUB — P7 gate. Do not enable until P6 (SST component) is complete.
-# This workflow deploys a throwaway SST stage and runs the redelivery+redeploy
-# conformance harness that verifies:
-#   - in-flight runs survive a Lambda cold redeploy and resume from the last checkpoint
-#   - redelivered SQS messages do NOT re-execute completed steps (idempotency ledger)
-#   - approval-gated tools hold → surface in queue → resume on approve
+# Deploys a throwaway SST stage (examples/reference-playbook) and runs the
+# @draht/conformance harness, which proves:
+#   - T3: HTTP submission → deterministic runId → SQS → executor DAG runs
+#   - T5: an in-flight run held at an approval survives a full `sst deploy`
+#   - T6: an approval-gated tool holds → APPROVAL# row → IAM-auth resume → completed
 #
-# Prerequisites before enabling:
-#   1. AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY + AWS_REGION secrets in the repo.
-#   2. A throwaway AWS account / stage for CI (NOT fr3n's production account).
-#   3. SST component (P6) deployed and tested.
-#   4. The conformance harness scripts in packages/runtime-aws/test/conformance/.
+# Neutral-skip: this job only runs when the `AWS_CI_ROLE_ARN` repo variable is
+# set (see conformance/README.md — this is a USER ACTION: provision a
+# throwaway AWS account/role and set the variable before this job will ever
+# execute). On pull_request it ALSO requires the `real-aws` label, to avoid
+# burning the gate's minutes on every push.
 #
-# IMPORTANT: dev MemoryQueue cannot surface at-least-once async-flush ordering races
-# (per design §4). Only a real deployed stage proves correctness.
+# Teardown ALWAYS runs (`if: always()`), independent of whether the harness
+# itself passed, failed, or crashed — see conformance/src/teardown.ts.
 
 on:
-  workflow_dispatch: # manual trigger only until fully wired
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+  pull_request:
+    types: [labeled, synchronize]
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: real-aws
+  cancel-in-progress: false
 
 jobs:
   real-aws:
     name: deploy throwaway stage + conformance
     runs-on: ubuntu-latest
-    if: false # STUB: disabled — see comments above
+    timeout-minutes: 25
+    # Fork PRs never run: pull_request (not _target) already denies forks an OIDC
+    # token, and the same-repo guard below skips them outright (defense-in-depth).
+    if: ${{ vars.AWS_CI_ROLE_ARN != '' && (github.event_name != 'pull_request' || (github.event.pull_request.head.repo.full_name == github.repository && contains(github.event.pull_request.labels.*.name, 'real-aws'))) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,26 +59,27 @@ jobs:
       - name: Build
         run: pnpm build
 
-      # STUB: when enabled:
-      # - name: Deploy throwaway SST stage
-      #   run: pnpm sst deploy --stage ci-${{ github.run_id }}
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     AWS_REGION: ${{ secrets.AWS_REGION }}
+      - name: Sanity check — sst CLI resolves
+        run: pnpm exec sst version
 
-      # - name: Run conformance harness
-      #   run: pnpm tsx packages/runtime-aws/test/conformance/run.ts
-      #   env:
-      #     DRAHT_STAGE: ci-${{ github.run_id }}
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     AWS_REGION: ${{ secrets.AWS_REGION }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_CI_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_CI_REGION || 'eu-central-1' }}
 
-      # - name: Teardown throwaway stage
-      #   if: always()
-      #   run: pnpm sst remove --stage ci-${{ github.run_id }}
-      #   env:
-      #     AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     AWS_REGION: ${{ secrets.AWS_REGION }}
+      - name: Run conformance harness (deploy → checks → teardown)
+        timeout-minutes: 18
+        run: >
+          pnpm conformance:real-aws --
+          --stage ci-${{ github.run_id }}
+          --region ${{ vars.AWS_CI_REGION || 'eu-central-1' }}
+          --dir examples/reference-playbook
+
+      - name: Guaranteed teardown
+        if: always()
+        run: >
+          pnpm exec tsx conformance/src/teardown-cli.ts
+          --stage ci-${{ github.run_id }}
+          --region ${{ vars.AWS_CI_REGION || 'eu-central-1' }}
+          --dir examples/reference-playbook

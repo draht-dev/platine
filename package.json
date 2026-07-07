@@ -8,12 +8,15 @@
     "test:fixtures": "pnpm -F @draht/fixtures-miswire test",
     "typecheck": "pnpm -r exec tsgo --noEmit",
     "verify": "pnpm build && pnpm typecheck && pnpm test && pnpm test:fixtures",
-    "lint": "echo 'lint: stub — wire ESLint in a later phase'"
+    "lint": "echo 'lint: stub — wire ESLint in a later phase'",
+    "conformance:real-aws": "tsx conformance/src/harness.ts",
+    "conformance:dry-run": "tsx conformance/src/harness.ts --dry-run"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.12",
     "@types/node": "^20.19.0",
     "@typescript/native-preview": "^7.0.0-dev.20260619.1",
+    "sst": "^4.15.2",
     "tsup": "^8.5.1",
     "tsx": "^4.22.4",
     "typescript": "~5.9.0",

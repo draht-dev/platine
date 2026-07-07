@@ -1,0 +1,39 @@
+# =============================================================================
+# USER ACTION REQUIRED: this fixture is SEEDED, not captured.
+#
+# The transcript below follows the documented SST Ion `sst deploy` stdout
+# format (completion marker "✓  Complete" followed by indented
+# "<PascalKey>: <value>" stack output lines), but the exact wording of the
+# progress lines above the marker, and the literal URL/ARN shapes below it,
+# have NOT been verified against a real deploy of examples/reference-playbook.
+#
+# Back-fill this file from the stdout of the FIRST real
+# `pnpm conformance:real-aws` dispatch (see conformance/README.md), replacing
+# everything below this comment banner with the actual captured transcript.
+# Leave this banner in place until that back-fill happens — sst-outputs.test.ts
+# only exercises the block after the completion marker, so this banner does
+# not affect parsing.
+# =============================================================================
+
+SST 3.15.2  ready!
+
+➜  App:        draht-reference-playbook
+   Stage:      ci-1234567890
+
+~  Deploy
+
+|  Created      SupportTriageAgentDlq sst.aws.Queue
+|  Created      SupportTriageAgentQueue sst.aws.Queue
+|  Created      SupportTriageAgentBus sst.aws.Bus
+|  Created      SupportTriageAgentTable sst.aws.Dynamo
+|  Created      SupportTriageAgentManifestSeed aws:dynamodb:TableItem
+|  Created      SupportTriageAgentExecutor sst.aws.Function
+|  Created      SupportTriageAgentIngressUrlhttp-in sst.aws.Function
+|  Created      SupportTriageAgentResume sst.aws.Function
+|  Created      SupportTriageAgentDlqAlarm aws:cloudwatch:MetricAlarm
+
+✓  Complete
+   SupportTriageAgentUrl: https://a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6.lambda-url.eu-central-1.on.aws/
+   SupportTriageAgentTableName: draht-reference-playbook-ci-1234567890-supporttriageagenttabletable
+   SupportTriageAgentResumeUrl: https://z9y8x7w6v5u4t3s2r1q0p9o8n7m6l5k4.lambda-url.eu-central-1.on.aws/
+   SupportTriageAgentManifestRevision: rev_a3f91c08b7
