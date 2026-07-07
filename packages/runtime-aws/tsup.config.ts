@@ -19,11 +19,16 @@ export default defineConfig({
   treeshake: true,
   sourcemap: true,
   // Do NOT bundle @aws-sdk/* or electrodb — these are runtime deps resolved at deploy time.
+  // @aws-sdk/client-bedrock-runtime and @anthropic-ai/sdk are optionalDependencies reached
+  // ONLY via lazy `await import()` in resolve-model.ts — keep them external too so a
+  // consumer without one of the two providers installed doesn't need the other's SDK.
   external: [
     "@aws-sdk/client-dynamodb",
     "@aws-sdk/client-eventbridge",
     "@aws-sdk/client-sqs",
     "@aws-sdk/lib-dynamodb",
+    "@aws-sdk/client-bedrock-runtime",
+    "@anthropic-ai/sdk",
     "electrodb",
   ],
 });

@@ -8,8 +8,7 @@
  *   { runId, tenantId, continuationCount, chainDepth }
  *
  * The handler constructs the Adapters bundle from environment variables and
- * invokes drive() for each record. Errors are caught per-record to avoid
- * poisoning the batch.
+ * invokes drive() for each record (via the shared driveRecords() in deps.ts).
  *
  * SQS batchSize should be 1 for the executor (one run per Lambda invocation)
  * to avoid head-of-line blocking. The SST component configures this.
@@ -18,81 +17,24 @@
  * SQS visibility timeout MUST exceed the Lambda function timeout.
  */
 
-import { randomUUID } from "node:crypto";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
-import { EventBridgeClient } from "@aws-sdk/client-eventbridge";
-import { SQSClient } from "@aws-sdk/client-sqs";
-
-import type { TenantId, RunId } from "@draht/core/seams";
-import { DEFAULT_TENANT } from "@draht/core/seams";
-
-import { drive, type ExecutorContext, type ExecutorDeps, type Queue } from "../executor.js";
-import { DynamoStorage } from "../storage-dynamo.js";
-import { EventBridgeBus } from "../event-eventbridge.js";
+import type { TenantId } from "@draht/core/seams";
+import type { Model, ModelRequest, ModelStreamEvent } from "@draht/core/seams";
+import type { ExecutorDeps, ToolsDispatcher } from "../executor.js";
+import { buildAwsDeps, driveRecords, type SQSEvent, type LambdaContext } from "./deps.js";
 
 // ---------------------------------------------------------------------------
-// Lambda handler types (subset of @types/aws-lambda)
+// Stub implementation for tools (v1: local tools not supported via Lambda)
 // ---------------------------------------------------------------------------
-
-interface SQSRecord {
-  body: string;
-  messageAttributes?: Record<string, { dataType: string; stringValue?: string }>;
-}
-
-interface SQSEvent {
-  Records: SQSRecord[];
-}
-
-interface LambdaContext {
-  getRemainingTimeInMillis(): number;
-}
-
-// ---------------------------------------------------------------------------
-// SQS Queue adapter — wraps SQSClient to implement the executor's Queue seam
-// ---------------------------------------------------------------------------
-
-class SqsQueue implements Queue {
-  constructor(
-    private readonly client: SQSClient,
-    private readonly queueUrl: string,
-  ) {}
-
-  async enqueueContinuation(runId: RunId, continuationCount: number): Promise<void> {
-    const { SendMessageCommand } = await import("@aws-sdk/client-sqs");
-    await this.client.send(
-      new SendMessageCommand({
-        QueueUrl: this.queueUrl,
-        MessageBody: JSON.stringify({ runId, continuationCount }),
-        MessageAttributes: {
-          continuationCount: { DataType: "Number", StringValue: String(continuationCount) },
-          runId: { DataType: "String", StringValue: runId },
-        },
-      }),
-    );
-  }
-
-  async enqueueDeadLetter(runId: RunId, reason: string): Promise<void> {
-    // Log to CloudWatch; actual DLQ routing is handled by the SQS redrive policy.
-    console.error(`[executor] DLQ: runId=${runId} reason=${reason}`);
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Stub implementations for tools/approvals (v1: local tools not supported via Lambda)
-// ---------------------------------------------------------------------------
-
-import type { ToolsDispatcher, ApprovalsCoordinator } from "../executor.js";
-import type { ApprovalRow } from "@draht/core/seams";
 
 /**
  * v1 STUB dispatcher. The deployed executor runs the full DAG-scheduling +
- * checkpoint/resume + approval-gate machinery, but does NOT yet execute the
- * user's authored tool `execute()` code — that requires bundling the agent's
- * compiled tools/*.ts into the Lambda + a per-agent tool registry (tracked as a
- * v1.x item). Until then a tool node returns an empty stub result (and warns) so
- * the durability/approval machinery is exercisable end-to-end on real AWS.
- * Tool BUSINESS LOGIC is not run; tool RESULTS are stubbed.
+ * checkpoint/resume + approval-gate machinery, but does NOT execute the
+ * user's authored tool `execute()` code — this legacy handler is wired to a
+ * FIXED module (@draht/runtime-aws/handlers) so user code is never bundled.
+ * Agents that need real tool execution should use `platine build`'s emitted
+ * `.platine/executor.entry.ts` (makeExecutorHandler in make-executor.ts),
+ * which builds a RealToolsDispatcher from the agent's own WorkflowDef.
+ * Tool BUSINESS LOGIC is not run here; tool RESULTS are stubbed.
  */
 class StubToolsDispatcher implements ToolsDispatcher {
   async execute(toolRef: string, _input: Record<string, unknown>, _ctx: { idempotencyKey: string; tenantId: TenantId }): Promise<unknown> {
@@ -102,43 +44,10 @@ class StubToolsDispatcher implements ToolsDispatcher {
   hasSideEffect(_toolRef: string): boolean { return true; }
 }
 
-class StorageApprovalsCoordinator implements ApprovalsCoordinator {
-  constructor(private readonly storage: DynamoStorage) {}
-
-  async hold(params: {
-    runId: RunId;
-    tenantId: TenantId;
-    nodeId: string;
-    toolName: string;
-    paramsJson: string;
-    idempotencyKey: string;
-  }): Promise<string> {
-    // SECURITY FIX (CRITICAL 2): generate an unguessable actionId using
-    // crypto.randomUUID() so that approval actionIds cannot be forged by an
-    // attacker who knows the runId and nodeId (both of which are predictable).
-    // The old scheme `action_${runId}_${nodeId}_${counter}` was fully computable
-    // from public information and allowed unauthorized approval resolution.
-    const actionId = `action_${randomUUID()}`;
-    const row: ApprovalRow = {
-      runId: params.runId,
-      stepId: params.nodeId,
-      actionId,
-      nodeId: params.nodeId,
-      toolName: params.toolName,
-      paramsJson: params.paramsJson,
-      status: "pending",
-      idempotencyKey: params.idempotencyKey,
-    };
-    await this.storage.createPendingApproval(row);
-    return actionId;
-  }
-}
-
 // ---------------------------------------------------------------------------
-// NoopModel — placeholder (model is not used by tool/agent nodes via Lambda dispatch)
+// NoopModel — placeholder (model is not used by tool/agent nodes via this
+// legacy Lambda dispatch path; see makeExecutorHandler for the real adapter).
 // ---------------------------------------------------------------------------
-
-import type { Model, ModelRequest, ModelStreamEvent } from "@draht/core/seams";
 
 class NoopModel implements Model {
   stream(_req: ModelRequest, _signal?: AbortSignal): AsyncIterable<ModelStreamEvent> {
@@ -151,22 +60,6 @@ class NoopModel implements Model {
 }
 
 // ---------------------------------------------------------------------------
-// NoopTenancy
-// ---------------------------------------------------------------------------
-
-import type { Tenancy, Usage } from "@draht/core/seams";
-
-class NoopTenancy implements Tenancy {
-  async resolveTenant(): Promise<TenantId> { return DEFAULT_TENANT; }
-  async checkQuota(_t: TenantId, _kind: "run"): Promise<{ allowed: boolean; used: number; limit: number; remaining: number }> {
-    return { allowed: true, used: 0, limit: 99999, remaining: 99999 };
-  }
-  async recordUsage(_t: TenantId, _usage: Usage, _costUsd: number): Promise<void> {}
-  async shouldBreak(_t: TenantId, _agentId: string): Promise<boolean> { return false; }
-  async tripBreaker(_t: TenantId, _agentId: string): Promise<void> {}
-}
-
-// ---------------------------------------------------------------------------
 // executorHandler
 // ---------------------------------------------------------------------------
 
@@ -174,55 +67,12 @@ export async function executorHandler(
   event: SQSEvent,
   context: LambdaContext,
 ): Promise<void> {
-  const tableName = process.env["DRAHT_TABLE_NAME"];
-  const busName   = process.env["DRAHT_BUS_NAME"] ?? "default";
-  const queueUrl  = process.env["DRAHT_QUEUE_URL"];
+  const base = buildAwsDeps();
+  const deps: ExecutorDeps = {
+    ...base,
+    model: new NoopModel(),
+    tools: new StubToolsDispatcher(),
+  };
 
-  if (!tableName) throw new Error("DRAHT_TABLE_NAME env var is required");
-  if (!queueUrl)  throw new Error("DRAHT_QUEUE_URL env var is required");
-
-  const ddbClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
-  const storage   = new DynamoStorage(tableName, ddbClient);
-  const bus       = new EventBridgeBus(busName, new EventBridgeClient({}));
-  const queue     = new SqsQueue(new SQSClient({}), queueUrl);
-  const tenancy   = new NoopTenancy();
-  const tools     = new StubToolsDispatcher();
-  const approvals = new StorageApprovalsCoordinator(storage);
-  const model     = new NoopModel();
-
-  const deps: ExecutorDeps = { storage, model, eventBus: bus, tenancy, queue, tools, approvals };
-
-  // Soft time budget: Lambda timeout - 3 minutes
-  const softBudget = 3 * 60 * 1000;
-  const deadlineAt = Date.now() + context.getRemainingTimeInMillis() - softBudget;
-
-  for (const record of event.Records) {
-    let runId: RunId | undefined;
-    try {
-      const msg = JSON.parse(record.body) as Record<string, unknown>;
-      runId = (msg["runId"] as RunId) ?? undefined;
-      const tenantId = (msg["tenantId"] as TenantId) ?? DEFAULT_TENANT;
-      const continuationCount = typeof msg["continuationCount"] === "number" ? msg["continuationCount"] : 0;
-
-      if (!runId) {
-        console.error("[executor] SQS record missing runId:", record.body);
-        continue;
-      }
-
-      const ctx: ExecutorContext = {
-        tenantId,
-        runId,
-        deadlineAt,
-        maxContinuations: 10,
-        continuationCount,
-      };
-
-      await drive(ctx, deps);
-    } catch (err) {
-      console.error(`[executor] drive() error for runId=${runId ?? "unknown"}:`, err);
-      // Do NOT rethrow — this would cause the whole batch to retry
-      // The individual record's message visibility will expire and the message
-      // will be redelivered naturally (SQS at-least-once).
-    }
-  }
+  await driveRecords(event, context, deps);
 }

@@ -35,8 +35,14 @@
     "@types/node": "^20.19.0",
     "aws-sdk-client-mock": "^4.1.0",
     "dynamodb-local": "^0.0.38",
+    "esbuild": "^0.24.0",
     "tsup": "^8.5.0",
     "typescript": "~5.9.0",
-    "vitest": "^3.2.3"
+    "vitest": "^3.2.3",
+    "zod": "^3.25.76"
+  },
+  "optionalDependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.1071.0",
+    "@anthropic-ai/sdk": "^0.54.0"
   }
 }

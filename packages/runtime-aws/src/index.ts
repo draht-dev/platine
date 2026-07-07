@@ -61,3 +61,11 @@ export { SlackChannel, buildSlackSignature } from "./channel-slack.js";
 export type { SlackChannelOptions } from "./channel-slack.js";
 export { AwsRuntime } from "./runtime-aws.js";
 export type { AwsRuntimeOptions } from "./runtime-aws.js";
+
+// P6/v1.x — real tool execution + model resolution + per-agent executor factory
+export { RealToolsDispatcher } from "./tools-dispatcher.js";
+export type { ToolRegistry } from "./tools-dispatcher.js";
+export { resolveModelFromEnv, resolveProvider } from "./resolve-model.js";
+export type { ModelProvider } from "./resolve-model.js";
+export { makeExecutorHandler } from "./handlers/make-executor.js";
+export type { MakeExecutorOptions, ExecutorLambdaHandler } from "./handlers/make-executor.js";
