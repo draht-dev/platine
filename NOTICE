@@ -1,12 +1,13 @@
 platine — the draht agent framework
-Copyright 2026 draht-dev
+Copyright 2026 Oskar Freye (draht-dev)
 
 This product is licensed under the Apache License, Version 2.0.
 See the LICENSE file for the full license text.
 
 SPDX-License-Identifier: Apache-2.0
 
-This software is developed and maintained by draht-dev.
+This software is developed and maintained by Oskar Freye under the project name draht
+(draht-dev is a project name, not a legal entity).
 Framework name: platine (German: circuit board — draht is the wire, platine is the board you wire agents onto).
 CLI binary: platine
 npm scope: @draht/*

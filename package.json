@@ -26,5 +26,7 @@
     "node": ">=20",
     "pnpm": ">=9"
   },
-  "packageManager": "pnpm@11.8.0"
+  "packageManager": "pnpm@11.8.0",
+  "author": "Oskar Freye <contact@draht.dev>",
+  "license": "Apache-2.0"
 }
